@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📚 Library Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0e17;
+    --surface: #1a1828;
+    --card: #201e30;
+    --border: #2e2b45;
+    --accent: #e8a045;
+    --accent2: #7c5cbf;
+    --text: #fffffe;
+    --muted: #a7a5b8;
+    --danger: #e05c5c;
+    --success: #4caf82;
+    --radius: 14px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #1a1828 0%, #0f0e17 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex; align-items:center; justify-content:space-between;
+    height: 68px; position: sticky; top:0; z-index:100;
+    backdrop-filter: blur(12px);
+  }
+  .logo { display:flex; align-items:center; gap:12px; }
+  .logo-icon { font-size:28px; }
+  .logo h1 { font-family:'Playfair Display',serif; font-size:22px; color:var(--accent); letter-spacing:0.5px; }
+  .logo span { font-size:12px; color:var(--muted); display:block; margin-top:-2px; }
+  .header-stats { display:flex; gap:24px; }
+  .stat-pill { background:var(--card); border:1px solid var(--border); border-radius:50px; padding:6px 16px; font-size:13px; color:var(--muted); }
+  .stat-pill b { color:var(--accent); }
+
+  /* NAV TABS */
+  nav { background:var(--surface); border-bottom:1px solid var(--border); padding:0 32px; display:flex; gap:4px; }
+  .tab { padding:14px 20px; font-size:14px; font-weight:500; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; transition:all .2s; user-select:none; }
+  .tab:hover { color:var(--text); }
+  .tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+
+  /* PAGES */
+  .page { display:none; padding:32px; animation: fadeIn .3s ease; }
+  .page.active { display:block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+  /* DASHBOARD */
+  .dash-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; margin-bottom:32px; }
+  .kpi { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:24px; position:relative; overflow:hidden; }
+  .kpi::before { content:''; position:absolute; top:-20px; right:-20px; width:80px; height:80px; border-radius:50%; opacity:.12; }
+  .kpi.blue::before { background:#4a90e2; }
+  .kpi.orange::before { background:var(--accent); }
+  .kpi.purple::before { background:var(--accent2); }
+  .kpi.green::before { background:var(--success); }
+  .kpi-icon { font-size:28px; margin-bottom:12px; }
+  .kpi-val { font-family:'Playfair Display',serif; font-size:36px; font-weight:700; line-height:1; }
+  .kpi-label { font-size:13px; color:var(--muted); margin-top:6px; }
+
+  .section-title { font-family:'Playfair Display',serif; font-size:20px; margin-bottom:16px; display:flex; align-items:center; gap:10px; }
+  .section-title span { font-size:14px; color:var(--muted); font-family:'DM Sans',sans-serif; font-weight:400; }
+
+  /* TABLE */
+  .table-wrap { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+  table { width:100%; border-collapse:collapse; }
+  thead th { background:var(--surface); padding:12px 18px; text-align:left; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.8px; color:var(--muted); }
+  tbody tr { border-top:1px solid var(--border); transition:background .15s; }
+  tbody tr:hover { background:rgba(255,255,255,.03); }
+  td { padding:14px 18px; font-size:14px; }
+  .badge { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:50px; font-size:12px; font-weight:500; }
+  .badge.available { background:rgba(76,175,130,.15); color:var(--success); }
+  .badge.issued { background:rgba(224,92,92,.15); color:var(--danger); }
+  .badge.reserved { background:rgba(124,92,191,.15); color:#b08ff0; }
+
+  /* FORM */
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  .form-group { display:flex; flex-direction:column; gap:8px; }
+  .form-group.full { grid-column:1/-1; }
+  label { font-size:13px; font-weight:500; color:var(--muted); }
+  input, select, textarea {
+    background:var(--card); border:1px solid var(--border); border-radius:10px;
+    padding:12px 16px; color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px;
+    transition:border-color .2s;
+  }
+  input:focus, select:focus, textarea:focus { outline:none; border-color:var(--accent); }
+  textarea { resize:vertical; min-height:80px; }
+  select option { background:var(--card); }
+
+  /* BUTTONS */
+  .btn { padding:11px 22px; border-radius:10px; border:none; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:600; cursor:pointer; transition:all .2s; display:inline-flex; align-items:center; gap:8px; }
+  .btn-primary { background:var(--accent); color:#0f0e17; }
+  .btn-primary:hover { background:#f0b060; transform:translateY(-1px); box-shadow:0 6px 20px rgba(232,160,69,.3); }
+  .btn-secondary { background:var(--card); color:var(--text); border:1px solid var(--border); }
+  .btn-secondary:hover { border-color:var(--accent); color:var(--accent); }
+  .btn-danger { background:rgba(224,92,92,.15); color:var(--danger); border:1px solid rgba(224,92,92,.3); }
+  .btn-danger:hover { background:var(--danger); color:white; }
+  .btn-success { background:rgba(76,175,130,.15); color:var(--success); border:1px solid rgba(76,175,130,.3); }
+  .btn-success:hover { background:var(--success); color:white; }
+  .btn-sm { padding:7px 14px; font-size:12px; border-radius:8px; }
+
+  .form-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:28px; margin-bottom:28px; }
+  .form-actions { display:flex; gap:12px; margin-top:24px; }
+
+  /* SEARCH BAR */
+  .search-bar { display:flex; gap:12px; margin-bottom:20px; }
+  .search-input { flex:1; position:relative; }
+  .search-input input { width:100%; padding-left:44px; }
+  .search-icon { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:16px; color:var(--muted); }
+
+  /* MODAL */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:500; align-items:center; justify-content:center; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:var(--card); border:1px solid var(--border); border-radius:20px; padding:32px; width:480px; max-width:95vw; animation: fadeIn .25s ease; }
+  .modal h3 { font-family:'Playfair Display',serif; font-size:22px; margin-bottom:20px; }
+  .modal-actions { display:flex; gap:12px; margin-top:24px; justify-content:flex-end; }
+
+  /* TOAST */
+  #toast { position:fixed; bottom:28px; right:28px; background:var(--success); color:white; padding:14px 22px; border-radius:12px; font-size:14px; font-weight:500; z-index:999; transform:translateY(80px); opacity:0; transition:all .3s; }
+  #toast.show { transform:translateY(0); opacity:1; }
+  #toast.error { background:var(--danger); }
+
+  /* RECENT ACTIVITY */
+  .activity-list { display:flex; flex-direction:column; gap:10px; }
+  .activity-item { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px 18px; display:flex; align-items:center; gap:14px; }
+  .activity-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .activity-dot.issued { background:var(--danger); }
+  .activity-dot.returned { background:var(--success); }
+  .activity-dot.added { background:var(--accent); }
+  .activity-text { flex:1; font-size:14px; }
+  .activity-time { font-size:12px; color:var(--muted); }
+
+  /* MEMBERS */
+  .member-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:18px; }
+  .member-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
+  .member-avatar { width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg,var(--accent2),var(--accent)); display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:700; margin-bottom:12px; color:white; }
+  .member-name { font-weight:600; font-size:16px; }
+  .member-id { font-size:12px; color:var(--muted); margin-top:2px; }
+  .member-info { margin-top:12px; padding-top:12px; border-top:1px solid var(--border); font-size:13px; color:var(--muted); display:flex; flex-direction:column; gap:4px; }
+  .member-actions { margin-top:14px; display:flex; gap:8px; }
+
+  @media(max-width:768px){
+    .dash-grid{grid-template-columns:1fr 1fr;}
+    .form-grid{grid-template-columns:1fr;}
+    header{padding:0 16px;}
+    .header-stats{display:none;}
+    nav{padding:0 12px; overflow-x:auto;}
+    .page{padding:16px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">📚</div>
+    <div>
+      <h1>LibraryPro</h1>
+      <span>Management System</span>
+    </div>
+  </div>
+  <div class="header-stats">
+    <div class="stat-pill">Total Books: <b id="h-books">0</b></div>
+    <div class="stat-pill">Issued: <b id="h-issued">0</b></div>
+    <div class="stat-pill">Members: <b id="h-members">0</b></div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav>
+  <div class="tab active" onclick="showPage('dashboard')">🏠 Dashboard</div>
+  <div class="tab" onclick="showPage('books')">📖 Books</div>
+  <div class="tab" onclick="showPage('members')">👥 Members</div>
+  <div class="tab" onclick="showPage('issue')">📤 Issue / Return</div>
+  <div class="tab" onclick="showPage('records')">📋 Records</div>
+</nav>
+
+<!-- DASHBOARD -->
+<div class="page active" id="page-dashboard">
+  <div class="dash-grid">
+    <div class="kpi blue">
+      <div class="kpi-icon">📚</div>
+      <div class="kpi-val" id="kpi-total">0</div>
+      <div class="kpi-label">Total Books</div>
+    </div>
+    <div class="kpi orange">
+      <div class="kpi-icon">📤</div>
+      <div class="kpi-val" id="kpi-issued">0</div>
+      <div class="kpi-label">Books Issued</div>
+    </div>
+    <div class="kpi green">
+      <div class="kpi-icon">✅</div>
+      <div class="kpi-val" id="kpi-available">0</div>
+      <div class="kpi-label">Available</div>
+    </div>
+    <div class="kpi purple">
+      <div class="kpi-icon">👥</div>
+      <div class="kpi-val" id="kpi-members">0</div>
+      <div class="kpi-label">Members</div>
+    </div>
+  </div>
+
+  <div class="section-title">📋 Recent Activity <span>Last 10 transactions</span></div>
+  <div class="activity-list" id="activity-list">
+    <div style="color:var(--muted);font-size:14px;text-align:center;padding:24px">No activity yet. Add books and members to get started!</div>
+  </div>
+</div>
+
+<!-- BOOKS -->
+<div class="page" id="page-books">
+  <div class="form-card">
+    <div class="section-title">➕ Add New Book</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Book Title *</label>
+        <input type="text" id="b-title" placeholder="e.g. The Alchemist">
+      </div>
+      <div class="form-group">
+        <label>Author *</label>
+        <input type="text" id="b-author" placeholder="e.g. Paulo Coelho">
+      </div>
+      <div class="form-group">
+        <label>ISBN</label>
+        <input type="text" id="b-isbn" placeholder="e.g. 978-3-16-148410-0">
+      </div>
+      <div class="form-group">
+        <label>Genre</label>
+        <select id="b-genre">
+          <option>Fiction</option>
+          <option>Non-Fiction</option>
+          <option>Science</option>
+          <option>History</option>
+          <option>Technology</option>
+          <option>Biography</option>
+          <option>Children</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Total Copies</label>
+        <input type="number" id="b-copies" value="1" min="1">
+      </div>
+      <div class="form-group">
+        <label>Publisher</label>
+        <input type="text" id="b-publisher" placeholder="e.g. Penguin Books">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="addBook()">📚 Add Book</button>
+      <button class="btn btn-secondary" onclick="clearBookForm()">🔄 Clear</button>
+    </div>
+  </div>
+
+  <div class="search-bar">
+    <div class="search-input">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="book-search" placeholder="Search by title, author, ISBN..." oninput="renderBooks()">
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Title</th><th>Author</th><th>Genre</th><th>Copies</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="books-table"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MEMBERS -->
+<div class="page" id="page-members">
+  <div class="form-card">
+    <div class="section-title">👤 Register New Member</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Full Name *</label>
+        <input type="text" id="m-name" placeholder="e.g. Rahul Sharma">
+      </div>
+      <div class="form-group">
+        <label>Member ID *</label>
+        <input type="text" id="m-id" placeholder="e.g. MEM001">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="m-email" placeholder="e.g. rahul@gmail.com">
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="text" id="m-phone" placeholder="e.g. 9876543210">
+      </div>
+      <div class="form-group full">
+        <label>Address</label>
+        <textarea id="m-address" placeholder="e.g. 123 MG Road, Indore"></textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-primary" onclick="addMember()">👤 Register Member</button>
+      <button class="btn btn-secondary" onclick="clearMemberForm()">🔄 Clear</button>
+    </div>
+  </div>
+
+  <div class="section-title">👥 All Members</div>
+  <div class="member-grid" id="members-grid"></div>
+</div>
+
+<!-- ISSUE / RETURN -->
+<div class="page" id="page-issue">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+    <div class="form-card">
+      <div class="section-title">📤 Issue Book</div>
+      <div class="form-group" style="margin-bottom:16px">
+        <label>Select Member</label>
+        <select id="i-member"></select>
+      </div>
+      <div class="form-group" style="margin-bottom:16px">
+        <label>Select Book</label>
+        <select id="i-book"></select>
+      </div>
+      <div class="form-group" style="margin-bottom:16px">
+        <label>Issue Date</label>
+        <input type="date" id="i-date">
+      </div>
+      <div class="form-group" style="margin-bottom:16px">
+        <label>Due Date</label>
+        <input type="date" id="i-due">
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="issueBook()">📤 Issue Book</button>
+    </div>
+    <div class="form-card">
+      <div class="section-title">📥 Return Book</div>
+      <div class="form-group" style="margin-bottom:16px">
+        <label>Select Issue Record</label>
+        <select id="r-record"></select>
+      </div>
+      <div class="form-group" style="margin-bottom:16px">
+        <label>Return Date</label>
+        <input type="date" id="r-date">
+      </div>
+      <div id="fine-display" style="display:none;background:rgba(224,92,92,.1);border:1px solid rgba(224,92,92,.3);border-radius:10px;padding:14px;margin-bottom:16px;font-size:14px;color:var(--danger)"></div>
+      <button class="btn btn-success" style="width:100%" onclick="returnBook()">📥 Return Book</button>
+    </div>
+  </div>
+</div>
+
+<!-- RECORDS -->
+<div class="page" id="page-records">
+  <div class="search-bar">
+    <div class="search-input">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="rec-search" placeholder="Search records..." oninput="renderRecords()">
+    </div>
+    <select id="rec-filter" onchange="renderRecords()" style="width:160px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;color:var(--text);font-size:14px">
+      <option value="">All</option>
+      <option value="issued">Issued</option>
+      <option value="returned">Returned</option>
+    </select>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Member</th><th>Book</th><th>Issue Date</th><th>Due Date</th><th>Return Date</th><th>Fine</th><th>Status</th></tr></thead>
+      <tbody id="records-table"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ============ STATE ============
+let books = JSON.parse(localStorage.getItem('lms_books') || '[]');
+let members = JSON.parse(localStorage.getItem('lms_members') || '[]');
+let records = JSON.parse(localStorage.getItem('lms_records') || '[]');
+let activity = JSON.parse(localStorage.getItem('lms_activity') || '[]');
+
+// ============ SAVE ============
+function save() {
+  localStorage.setItem('lms_books', JSON.stringify(books));
+  localStorage.setItem('lms_members', JSON.stringify(members));
+  localStorage.setItem('lms_records', JSON.stringify(records));
+  localStorage.setItem('lms_activity', JSON.stringify(activity));
+  updateHeader();
+  updateKPIs();
+}
+
+// ============ TOAST ============
+function toast(msg, isError=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (isError?' error':'');
+  setTimeout(()=>t.className='',3000);
+}
+
+// ============ PAGE NAV ============
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  event.target.classList.add('active');
+  if(id==='issue') populateIssueSelects();
+  if(id==='records') renderRecords();
+  if(id==='books') renderBooks();
+  if(id==='members') renderMembers();
+  if(id==='dashboard') renderActivity();
+}
+
+// ============ HEADER & KPIs ============
+function updateHeader() {
+  document.getElementById('h-books').textContent = books.length;
+  document.getElementById('h-issued').textContent = records.filter(r=>r.status==='issued').length;
+  document.getElementById('h-members').textContent = members.length;
+}
+function updateKPIs() {
+  const total = books.reduce((a,b)=>a+b.copies,0);
+  const issued = records.filter(r=>r.status==='issued').length;
+  document.getElementById('kpi-total').textContent = books.length;
+  document.getElementById('kpi-issued').textContent = issued;
+  document.getElementById('kpi-available').textContent = books.filter(b=>b.available>0).length;
+  document.getElementById('kpi-members').textContent = members.length;
+}
+
+// ============ ACTIVITY ============
+function addActivity(type, text) {
+  activity.unshift({ type, text, time: new Date().toLocaleString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true}) });
+  if(activity.length>20) activity.pop();
+}
+function renderActivity() {
+  const el = document.getElementById('activity-list');
+  if(!activity.length){ el.innerHTML='<div style="color:var(--muted);font-size:14px;text-align:center;padding:24px">No activity yet.</div>'; return; }
+  el.innerHTML = activity.slice(0,10).map(a=>`
+    <div class="activity-item">
+      <div class="activity-dot ${a.type}"></div>
+      <div class="activity-text">${a.text}</div>
+      <div class="activity-time">${a.time}</div>
+    </div>`).join('');
+}
+
+// ============ BOOKS ============
+function addBook() {
+  const title = document.getElementById('b-title').value.trim();
+  const author = document.getElementById('b-author').value.trim();
+  if(!title||!author){ toast('Title and Author are required!',true); return; }
+  const copies = parseInt(document.getElementById('b-copies').value)||1;
+  books.push({
+    id:'BK'+Date.now(), title, author,
+    isbn: document.getElementById('b-isbn').value.trim(),
+    genre: document.getElementById('b-genre').value,
+    copies, available: copies,
+    publisher: document.getElementById('b-publisher').value.trim()
+  });
+  addActivity('added', `📚 New book added: "${title}" by ${author}`);
+  save(); renderBooks(); clearBookForm();
+  toast(`✅ Book "${title}" added successfully!`);
+}
+function clearBookForm() {
+  ['b-title','b-author','b-isbn','b-publisher'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('b-copies').value='1';
+}
+function deleteBook(id) {
+  if(!confirm('Delete this book?')) return;
+  books = books.filter(b=>b.id!==id);
+  save(); renderBooks();
+  toast('Book deleted.');
+}
+function renderBooks() {
+  const q = document.getElementById('book-search').value.toLowerCase();
+  const filtered = books.filter(b=>
+    b.title.toLowerCase().includes(q)||b.author.toLowerCase().includes(q)||(b.isbn||'').includes(q)
+  );
+  const tbody = document.getElementById('books-table');
+  if(!filtered.length){ tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px">No books found.</td></tr>'; return; }
+  tbody.innerHTML = filtered.map((b,i)=>`
+    <tr>
+      <td style="color:var(--muted)">${i+1}</td>
+      <td><b>${b.title}</b></td>
+      <td>${b.author}</td>
+      <td>${b.genre}</td>
+      <td>${b.available}/${b.copies}</td>
+      <td><span class="badge ${b.available>0?'available':'issued'}">${b.available>0?'✅ Available':'❌ Issued'}</span></td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteBook('${b.id}')">🗑 Delete</button></td>
+    </tr>`).join('');
+}
+
+// ============ MEMBERS ============
+function addMember() {
+  const name = document.getElementById('m-name').value.trim();
+  const mid = document.getElementById('m-id').value.trim();
+  if(!name||!mid){ toast('Name and Member ID are required!',true); return; }
+  if(members.find(m=>m.id===mid)){ toast('Member ID already exists!',true); return; }
+  members.push({
+    id: mid, name,
+    email: document.getElementById('m-email').value.trim(),
+    phone: document.getElementById('m-phone').value.trim(),
+    address: document.getElementById('m-address').value.trim(),
+    joined: new Date().toLocaleDateString('en-IN')
+  });
+  addActivity('added', `👤 New member registered: ${name} (${mid})`);
+  save(); renderMembers(); clearMemberForm();
+  toast(`✅ Member "${name}" registered!`);
+}
+function clearMemberForm() {
+  ['m-name','m-id','m-email','m-phone','m-address'].forEach(id=>document.getElementById(id).value='');
+}
+function deleteMember(id) {
+  if(!confirm('Delete this member?')) return;
+  members = members.filter(m=>m.id!==id);
+  save(); renderMembers();
+  toast('Member deleted.');
+}
+function renderMembers() {
+  const grid = document.getElementById('members-grid');
+  if(!members.length){ grid.innerHTML='<div style="color:var(--muted);font-size:14px">No members yet.</div>'; return; }
+  grid.innerHTML = members.map(m=>`
+    <div class="member-card">
+      <div class="member-avatar">${m.name[0].toUpperCase()}</div>
+      <div class="member-name">${m.name}</div>
+      <div class="member-id">ID: ${m.id}</div>
+      <div class="member-info">
+        ${m.email?`<span>📧 ${m.email}</span>`:''}
+        ${m.phone?`<span>📞 ${m.phone}</span>`:''}
+        <span>📅 Joined: ${m.joined}</span>
+        <span>📚 Books Issued: ${records.filter(r=>r.memberId===m.id&&r.status==='issued').length}</span>
+      </div>
+      <div class="member-actions">
+        <button class="btn btn-danger btn-sm" onclick="deleteMember('${m.id}')">🗑 Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+// ============ ISSUE / RETURN ============
+function populateIssueSelects() {
+  const ms = document.getElementById('i-member');
+  ms.innerHTML = members.length
+    ? members.map(m=>`<option value="${m.id}">${m.name} (${m.id})</option>`).join('')
+    : '<option>No members registered</option>';
+
+  const bs = document.getElementById('i-book');
+  const avail = books.filter(b=>b.available>0);
+  bs.innerHTML = avail.length
+    ? avail.map(b=>`<option value="${b.id}">${b.title} - ${b.author}</option>`).join('')
+    : '<option>No books available</option>';
+
+  const today = new Date().toISOString().split('T')[0];
+  const due = new Date(); due.setDate(due.getDate()+14);
+  document.getElementById('i-date').value = today;
+  document.getElementById('i-due').value = due.toISOString().split('T')[0];
+
+  const rs = document.getElementById('r-record');
+  const issued = records.filter(r=>r.status==='issued');
+  rs.innerHTML = issued.length
+    ? issued.map(r=>{
+        const m = members.find(m=>m.id===r.memberId);
+        const b = books.find(b=>b.id===r.bookId);
+        return `<option value="${r.id}">${m?m.name:'?'} → ${b?b.title:'?'} (${r.issueDate})</option>`;
+      }).join('')
+    : '<option>No books currently issued</option>';
+
+  const rdate = document.getElementById('r-date');
+  rdate.value = today;
+}
+
+function issueBook() {
+  const mid = document.getElementById('i-member').value;
+  const bid = document.getElementById('i-book').value;
+  if(!mid||!bid){ toast('Please select member and book!',true); return; }
+  const book = books.find(b=>b.id===bid);
+  const member = members.find(m=>m.id===mid);
+  if(!book||book.available<1){ toast('Book not available!',true); return; }
+  book.available--;
+  const rec = {
+    id: 'REC'+Date.now(), memberId:mid, bookId:bid,
+    memberName: member.name, bookTitle: book.title,
+    issueDate: document.getElementById('i-date').value,
+    dueDate: document.getElementById('i-due').value,
+    returnDate:'', fine:0, status:'issued'
+  };
+  records.push(rec);
+  addActivity('issued', `📤 "${book.title}" issued to ${member.name}`);
+  save(); populateIssueSelects();
+  toast(`✅ "${book.title}" issued to ${member.name}!`);
+}
+
+function returnBook() {
+  const rid = document.getElementById('r-record').value;
+  const rdate = document.getElementById('r-date').value;
+  if(!rid||!rdate){ toast('Please select record and return date!',true); return; }
+  const rec = records.find(r=>r.id===rid);
+  if(!rec){ toast('Record not found!',true); return; }
+  const book = books.find(b=>b.id===rec.bookId);
+
+  const due = new Date(rec.dueDate);
+  const ret = new Date(rdate);
+  let fine = 0;
+  if(ret>due) {
+    const days = Math.ceil((ret-due)/(1000*60*60*24));
+    fine = days * 2; // ₹2 per day
+  }
+
+  rec.returnDate = rdate;
+  rec.fine = fine;
+  rec.status = 'returned';
+  if(book) book.available++;
+
+  addActivity('returned', `📥 "${rec.bookTitle}" returned by ${rec.memberName}${fine>0?` (Fine: ₹${fine})`:''}`);
+  save(); populateIssueSelects(); renderRecords();
+  toast(`✅ Book returned!${fine>0?` Fine: ₹${fine}`:' No fine.'}`);
+}
+
+document.getElementById('r-date').addEventListener('change', function() {
+  const rid = document.getElementById('r-record').value;
+  const rec = records.find(r=>r.id===rid);
+  if(!rec) return;
+  const due = new Date(rec.dueDate);
+  const ret = new Date(this.value);
+  const fd = document.getElementById('fine-display');
+  if(ret>due){
+    const days = Math.ceil((ret-due)/(1000*60*60*24));
+    fd.style.display='block';
+    fd.textContent=`⚠️ Overdue by ${days} day(s). Fine: ₹${days*2}`;
+  } else { fd.style.display='none'; }
+});
+
+// ============ RECORDS ============
+function renderRecords() {
+  const q = (document.getElementById('rec-search').value||'').toLowerCase();
+  const f = document.getElementById('rec-filter').value;
+  let filtered = records.filter(r=>
+    (r.memberName||'').toLowerCase().includes(q)||(r.bookTitle||'').toLowerCase().includes(q)
+  );
+  if(f) filtered = filtered.filter(r=>r.status===f);
+  filtered = [...filtered].reverse();
+  const tbody = document.getElementById('records-table');
+  if(!filtered.length){ tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:24px">No records found.</td></tr>'; return; }
+  tbody.innerHTML = filtered.map((r,i)=>`
+    <tr>
+      <td style="color:var(--muted)">${i+1}</td>
+      <td>${r.memberName}</td>
+      <td>${r.bookTitle}</td>
+      <td>${r.issueDate}</td>
+      <td>${r.dueDate}</td>
+      <td>${r.returnDate||'—'}</td>
+      <td>${r.fine>0?`<span style="color:var(--danger)">₹${r.fine}</span>`:'—'}</td>
+      <td><span class="badge ${r.status}">${r.status==='issued'?'📤 Issued':'✅ Returned'}</span></td>
+    </tr>`).join('');
+}
+
+// ============ INIT ============
+updateHeader(); updateKPIs(); renderBooks(); renderMembers(); renderActivity();
+</script>
+</body>
+</html>
