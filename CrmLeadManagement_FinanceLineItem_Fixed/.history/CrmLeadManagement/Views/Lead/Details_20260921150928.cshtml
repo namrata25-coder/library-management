@@ -1,0 +1,1041 @@
+@model CrmLeadManagement.Models.Lead
+@{
+    var lead = Model!;
+    var activeTab = ViewData["ActiveTab"] as string ?? "call";
+    var activeFinanceSubTab = ViewData["ActiveFinanceSubTab"] as string ?? "estimation";
+    var requirementError = TempData["RequirementError"] as string;
+    var estimationError = TempData["EstimationError"] as string;
+    var quotationError = TempData["QuotationError"] as string;
+    var proposalError = TempData["ProposalError"] as string;
+    var latestCall = lead.CallHistory.Count > 0 ? lead.CallHistory[^1] : null;
+    var latestFollowUp = lead.FollowUps.Count > 0 ? lead.FollowUps[^1] : null;
+}
+
+<div class="breadcrumb-row">
+    <a asp-controller="Home" asp-action="Index">Home</a><span class="sep">/</span>
+    <a asp-controller="Lead" asp-action="List">Lead List</a><span class="sep">/</span>
+    <span class="current">@lead.LeadName</span>
+</div>
+
+<!-- ============ LEAD DETAILS HEADER ============ -->
+<div class="page-head">
+    <div class="detail-hero">
+        <div class="avatar-lg">@Initials(lead.LeadName)</div>
+        <div>
+            <h1>@lead.LeadName</h1>
+            <div class="meta">
+                <span>@lead.LeadId</span><span class="sep">•</span>
+                <span>@lead.CompanyName</span><span class="sep">•</span>
+                @Html.Raw(StatusBadge(lead.LeadStatus))
+                <span class="badge-priority pr-@lead.Priority.ToLower()">@lead.Priority priority</span>
+            </div>
+        </div>
+    </div>
+    <a asp-controller="Lead" asp-action="List" class="btn btn-ghost btn-sm"><i class="bi bi-arrow-left"></i> Back to Lead List</a>
+</div>
+
+<!-- ============ TABS: Call | Follow-up | Requirement | Assign/Re-assign ============ -->
+<div class="tabs-bar" role="tablist">
+    <button type="button" class="tab-btn" data-tab="call" onclick="switchLeadTab('call')">
+        <i class="bi bi-telephone-fill"></i> Call
+    </button>
+    <button type="button" class="tab-btn" data-tab="followup" onclick="switchLeadTab('followup')">
+        <i class="bi bi-calendar-check-fill"></i> Follow-up
+    </button>
+    <button type="button" class="tab-btn" data-tab="requirement" onclick="switchLeadTab('requirement')">
+        <i class="bi bi-clipboard-check"></i> Requirement
+    </button>
+    <button type="button" class="tab-btn" data-tab="assign" onclick="switchLeadTab('assign')">
+        <i class="bi bi-person-gear"></i> Assign / Re-assign
+    </button>
+    <button type="button" class="tab-btn" data-tab="finance" onclick="switchLeadTab('finance')">
+        <i class="bi bi-cash-coin"></i> Finance
+    </button>
+</div>
+
+<!-- ============ TAB CONTENT (only one panel visible at a time) ============ -->
+<div class="panel" style="margin-bottom:22px;">
+    <div class="panel-body">
+
+        <!-- ============ CALL TAB — read-only detail + history, no form ============ -->
+        <div class="tab-panel" id="tab-call">
+            <div class="section-title">Call History Detail</div>
+
+            @if (latestCall is null)
+            {
+                <div class="empty-state"><i class="bi bi-telephone-x"></i><p>No calls logged yet for this lead.</p></div>
+            }
+            else
+            {
+                <div class="info-grid">
+                    <div class="info-item"><div class="lbl">CALL DATE</div><div class="val">@latestCall.CallDate</div></div>
+                    <div class="info-item"><div class="lbl">CALL TIME</div><div class="val">@latestCall.CallTime</div></div>
+                    <div class="info-item"><div class="lbl">CALL STATUS</div><div class="val">@latestCall.CallStatus</div></div>
+                    <div class="info-item"><div class="lbl">DURATION</div><div class="val muted">@latestCall.Duration</div></div>
+                    <div class="info-item full"><div class="lbl">REMARKS</div><div class="val muted">@latestCall.Notes</div></div>
+                </div>
+
+                <div class="divider-line"></div>
+
+                <div class="section-title">Call History</div>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Call Date</th><th>Call Time</th><th>Call Status</th>
+                                <th>Duration</th><th>Employee</th><th>Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var c in lead.CallHistory.AsEnumerable().Reverse())
+                            {
+                                <tr>
+                                    <td>@c.CallDate</td>
+                                    <td>@c.CallTime</td>
+                                    <td>@c.CallStatus</td>
+                                    <td>@c.Duration</td>
+                                    <td>@c.Employee</td>
+                                    <td style="max-width:260px;">@c.Notes</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+
+        <!-- ============ FOLLOW-UP TAB — read-only detail + history, no form ============ -->
+        <div class="tab-panel" id="tab-followup">
+            <div class="section-title">Follow-up Detail</div>
+
+            @if (latestFollowUp is null)
+            {
+                <div class="empty-state"><i class="bi bi-calendar-x"></i><p>No follow-ups recorded for this lead.</p></div>
+            }
+            else
+            {
+                <div class="info-grid">
+                    <div class="info-item"><div class="lbl">FOLLOW-UP DATE</div><div class="val">@latestFollowUp.FollowUpDate</div></div>
+                    <div class="info-item"><div class="lbl">FOLLOW-UP TIME</div><div class="val">@latestFollowUp.FollowUpTime</div></div>
+                    <div class="info-item"><div class="lbl">STATUS</div><div class="val">@Html.Raw(FollowUpStatusBadge(latestFollowUp.Status))</div></div>
+                    <div class="info-item full"><div class="lbl">REMARKS</div><div class="val muted">@latestFollowUp.Remarks</div></div>
+                </div>
+
+                <div class="divider-line"></div>
+
+                <div class="section-title">Follow-up History</div>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Follow-up Date</th><th>Follow-up Time</th><th>Status</th><th>Remarks</th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var f in lead.FollowUps.AsEnumerable().Reverse())
+                            {
+                                <tr>
+                                    <td>@f.FollowUpDate</td>
+                                    <td>@f.FollowUpTime</td>
+                                    <td>@Html.Raw(FollowUpStatusBadge(f.Status))</td>
+                                    <td style="max-width:320px;">@f.Remarks</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+
+        <!-- ============ REQUIREMENT TAB — Add Requirement (with image) + saved list ============ -->
+        <div class="tab-panel" id="tab-requirement">
+            <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;">
+                <span>Requirements</span>
+                <button type="button" class="btn btn-primary btn-sm" onclick="toggleRequirementForm()">
+                    <i class="bi bi-plus-lg"></i> Add Requirement
+                </button>
+            </div>
+
+            @if (!string.IsNullOrEmpty(requirementError))
+            {
+                <div class="form-error-banner"><i class="bi bi-exclamation-triangle-fill"></i> @requirementError</div>
+            }
+
+            <div id="addRequirementForm" class="req-add-form" style="display:none;">
+                <form method="post" asp-controller="Lead" asp-action="AddRequirement" enctype="multipart/form-data">
+                    <input type="hidden" name="leadId" value="@lead.LeadId" />
+                    <div class="form-grid">
+                        <div class="form-field full">
+                            <label>Requirement Title <span class="req">*</span></label>
+                            <input type="text" name="title" required placeholder="e.g., MS Steel Rods supply" />
+                        </div>
+                        <div class="form-field full">
+                            <label>Requirement Description</label>
+                            <textarea name="description" placeholder="Describe the specifics of this requirement..."></textarea>
+                        </div>
+                        <div class="form-field">
+                            <label>Priority <span class="req">*</span></label>
+                            <select name="priority" required>
+                                @foreach (var p in LookupData.Priorities)
+                                {
+                                    <option value="@p">@p</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label>Status <span class="req">*</span></label>
+                            <select name="status" required>
+                                @foreach (var s in LookupData.RequirementStatuses)
+                                {
+                                    <option value="@s">@s</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label>Expected Date</label>
+                            <input type="date" name="expectedDate" />
+                        </div>
+                        <div class="form-field">
+                            <label>Budget</label>
+                            <input type="number" name="budget" min="0" step="0.01" placeholder="e.g., 250000" />
+                        </div>
+                        <div class="form-field full">
+                            <label>Image</label>
+                            <input type="file" name="image" accept=".jpg,.jpeg,.png,.gif,.webp" />
+                            <span style="font-size:11.5px;color:var(--ink-500);">Optional — attach a photo/reference image for this requirement.</span>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" onclick="toggleRequirementForm()">Cancel</button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Save Requirement</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="divider-line"></div>
+
+            <div class="section-title">Saved Requirements</div>
+            @if (lead.Requirements.Count == 0)
+            {
+                <div class="empty-state"><i class="bi bi-inbox"></i><p>No requirements added yet.</p></div>
+            }
+            else
+            {
+                @foreach (var r in lead.Requirements.AsEnumerable().Reverse())
+                {
+                    <div class="req-card">
+                        <div class="row1">
+                            <span class="badge-priority pr-@r.Priority.ToLower()">@r.Priority priority</span>
+                            <span class="badge-status st-new">@r.Status</span>
+                        </div>
+                        <div style="font-weight:700;font-size:14px;margin:6px 0 4px;">@(string.IsNullOrWhiteSpace(r.Title) ? r.ItemName : r.Title)</div>
+                        @if (!string.IsNullOrWhiteSpace(r.Description))
+                        {
+                            <div style="font-size:13px;color:var(--ink-700);margin-bottom:6px;">@r.Description</div>
+                        }
+                        <div style="font-size:12px;color:var(--ink-500);">
+                            @if (!string.IsNullOrWhiteSpace(r.ExpectedDate)) { <span>Expected by @r.ExpectedDate</span> }
+                            @if (!string.IsNullOrWhiteSpace(r.Budget)) { <span>&nbsp;•&nbsp;Budget: @r.Budget</span> }
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(r.ImagePath))
+                        {
+                            <div style="margin-top:10px;">
+                                <img src="@r.ImagePath" alt="Requirement attachment" style="max-width:220px;max-height:160px;border-radius:10px;border:1px solid var(--line);object-fit:cover;" />
+                            </div>
+                        }
+                    </div>
+                }
+            }
+        </div>
+
+        <!-- ============ ASSIGN / RE-ASSIGN TAB ============ -->
+        <div class="tab-panel" id="tab-assign">
+            <div class="section-title">Current Assignment</div>
+            <div class="assign-current">
+                <div class="avatar-chip">
+                    <div class="initials">@Initials(lead.AssignedTo)</div>
+                </div>
+                <div>
+                    <div class="lbl">CURRENTLY ASSIGNED TO</div>
+                    <div class="name">@(string.IsNullOrWhiteSpace(lead.AssignedTo) ? "Not assigned yet" : lead.AssignedTo)</div>
+                </div>
+            </div>
+
+            <div class="divider-line"></div>
+
+            <div class="section-title">Assign / Re-assign</div>
+            <form method="post" asp-controller="Lead" asp-action="AssignLead">
+                <input type="hidden" name="leadId" value="@lead.LeadId" />
+                <div class="form-grid">
+                    <div class="form-field full">
+                        <label>Assigned Employee <span class="req">*</span></label>
+                        <select name="assignedEmployee" required>
+                            <option value="">Select employee</option>
+                            @foreach (var e in LookupData.Employees)
+                            {
+                                @if (e == lead.AssignedTo)
+                                {
+                                    <option value="@e" selected>@e</option>
+                                }
+                                else
+                                {
+                                    <option value="@e">@e</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label>Assignment Date <span class="req">*</span></label>
+                        <input type="date" name="assignmentDate" required value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="form-field"></div>
+                    <div class="form-field full">
+                        <label>Remarks</label>
+                        <textarea name="remarks" placeholder="Reason for assignment / handover notes..."></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Save / Assign</button>
+                </div>
+            </form>
+
+            @if (lead.AssignmentHistory.Count > 0)
+            {
+                <div class="divider-line"></div>
+                <div class="section-title">Assignment History</div>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead><tr><th>Assigned Employee</th><th>Assignment Date</th><th>Remarks</th></tr></thead>
+                        <tbody>
+                            @foreach (var a in lead.AssignmentHistory.AsEnumerable().Reverse())
+                            {
+                                <tr>
+                                    <td>@a.AssignedEmployee</td>
+                                    <td>@a.AssignmentDate</td>
+                                    <td style="max-width:320px;">@a.Remarks</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+
+        <!-- ============ FINANCE TAB — Estimation | Quotation | Proposal sub-tabs ============ -->
+        <div class="tab-panel" id="tab-finance">
+            <div class="fin-subtabs" role="tablist">
+                <button type="button" class="fin-subtab-btn" data-subtab="estimation" onclick="switchFinanceSubTab('estimation')">
+                    <i class="bi bi-calculator"></i> Estimation
+                </button>
+                <button type="button" class="fin-subtab-btn" data-subtab="quotation" onclick="switchFinanceSubTab('quotation')">
+                    <i class="bi bi-file-earmark-text"></i> Quotation
+                </button>
+                <button type="button" class="fin-subtab-btn" data-subtab="proposal" onclick="switchFinanceSubTab('proposal')">
+                    <i class="bi bi-file-earmark-richtext"></i> Proposal
+                </button>
+            </div>
+
+            <!-- ===== ESTIMATION SUB-TAB ===== -->
+            <div class="fin-subpanel" id="finsub-estimation">
+                <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;">
+                    <span>Estimations</span>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="newFinanceForm('estimation')">
+                        <i class="bi bi-plus-lg"></i> New Estimation
+                    </button>
+                </div>
+
+                @if (!string.IsNullOrEmpty(estimationError))
+                {
+                    <div class="form-error-banner"><i class="bi bi-exclamation-triangle-fill"></i> @estimationError</div>
+                }
+
+                <div id="estimationForm" class="fin-add-form" style="display:none;">
+                    <div class="fin-form-title" style="display:flex;align-items:center;justify-content:space-between;">
+                        <span id="estimationFormTitle">New Estimation</span>
+                        <span class="fin-number-chip" id="estimationNumberDisplay">Auto-generated on save</span>
+                    </div>
+                    <form method="post" asp-controller="Lead" asp-action="SaveEstimation" enctype="multipart/form-data">
+                        <input type="hidden" name="leadId" value="@lead.LeadId" />
+                        <input type="hidden" name="number" id="estimationEditingNumber" value="" />
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label>Date <span class="req">*</span></label>
+                                <input type="date" name="date" id="estimationDate" required value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                            </div>
+                            <div class="form-field">
+                                <label>Lead / Customer</label>
+                                <input type="text" value="@lead.LeadName (@lead.CompanyName)" readonly style="background:var(--ink-100);color:var(--ink-500);" />
+                            </div>
+                            <div class="form-field full">
+                                <label>Project / Requirement</label>
+                                <input type="text" name="projectRequirement" id="estimationProjectRequirement" list="requirementList" placeholder="e.g., MS Steel Rods supply" />
+                            </div>
+                        </div>
+
+                        <div class="divider-line"></div>
+                        <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;">
+                            <span>Items / Services</span>
+                            <button type="button" class="btn btn-outline btn-sm" onclick="addFinanceItemRow('estimationItemsBody')">
+                                <i class="bi bi-plus-lg"></i> Add Item
+                            </button>
+                        </div>
+                        <table class="fin-item-table">
+                            <thead><tr><th style="width:40%;">Item / Service</th><th>Quantity</th><th>Rate</th><th>Amount</th><th></th></tr></thead>
+                            <tbody id="estimationItemsBody"></tbody>
+                        </table>
+
+                        <div class="fin-totals">
+                            <div class="fin-totals-row"><span>Subtotal</span><span id="estimationSubtotalDisplay">0.00</span></div>
+                            <div class="fin-totals-row"><span>Discount</span><input type="number" step="0.01" min="0" name="discount" id="estimationDiscount" value="0" oninput="recalcFinanceTotals('estimationItemsBody')" /></div>
+                            <div class="fin-totals-row"><span>GST / Tax</span><input type="number" step="0.01" min="0" name="tax" id="estimationTax" value="0" oninput="recalcFinanceTotals('estimationItemsBody')" /></div>
+                            <div class="fin-totals-row grand"><span>Total</span><span id="estimationTotalDisplay">0.00</span></div>
+                        </div>
+
+                        <div class="divider-line"></div>
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label>Valid Until</label>
+                                <input type="date" name="validUntil" id="estimationValidUntil" />
+                            </div>
+                            <div class="form-field">
+                                <label>Status <span class="req">*</span></label>
+                                <select name="status" id="estimationStatus" required>
+                                    @foreach (var s in LookupData.FinanceStatuses)
+                                    {
+                                        <option value="@s">@s</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-field full">
+                                <label>Terms &amp; Conditions</label>
+                                <textarea name="terms" id="estimationTerms" placeholder="Payment terms, delivery terms, validity..."></textarea>
+                            </div>
+                            <div class="form-field full">
+                                <label>Notes</label>
+                                <textarea name="notes" id="estimationNotes" placeholder="Internal notes..."></textarea>
+                            </div>
+                            <div class="form-field full">
+                                <label>Attach File</label>
+                                <div class="fin-attach-row">
+                                    <label class="btn btn-outline btn-sm fin-attach-btn" for="estimationAttachment">
+                                        <i class="bi bi-paperclip"></i> Choose File
+                                    </label>
+                                    <input type="file" name="attachment" id="estimationAttachment"
+                                           accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                                           style="display:none;" onchange="previewFinanceAttachment(this,'estimation')" />
+                                    <span id="estimationAttachmentFileName" class="fin-attach-filename">No file chosen</span>
+                                </div>
+                                <div id="estimationCurrentAttachment" class="fin-attach-current" style="display:none;">
+                                    <i class="bi bi-paperclip"></i> Current: <a href="#" id="estimationCurrentAttachmentLink" target="_blank" rel="noopener"></a>
+                                    <span class="hint">(uploading a new file will replace this)</span>
+                                </div>
+                                <div class="hint" style="margin-top:4px;">PDF, DOC, DOCX, XLS, XLSX, JPG, JPEG, PNG — up to 10 MB.</div>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-outline" onclick="cancelFinanceForm('estimation')">Cancel</button>
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Save Estimation</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="divider-line"></div>
+                <div class="section-title">Saved Estimations</div>
+                @if (lead.Estimations.Count == 0)
+                {
+                    <div class="empty-state"><i class="bi bi-calculator"></i><p>No estimations created yet.</p></div>
+                }
+                else
+                {
+                    @foreach (var e in lead.Estimations.AsEnumerable().Reverse())
+                    {
+                        <div class="fin-record-card">
+                            <div class="fin-record-head">
+                                <div class="fin-record-main">
+                                    <span class="fin-record-num">@e.Number</span>
+                                    <span class="fin-record-sub">@e.Date</span>
+                                    <span class="badge-status st-new">@e.Status</span>
+                                    <span class="fin-record-amt">₹@e.Total</span>
+                                </div>
+                                <div class="fin-record-actions">
+                                    <button type="button" class="fin-icon-btn" title="View" onclick="toggleFinanceDetail('est-detail-@e.Number')"><i class="bi bi-eye"></i></button>
+                                    <button type="button" class="fin-icon-btn" title="Edit" onclick="editFinanceRecord('estimation','@e.Number')"><i class="bi bi-pencil"></i></button>
+                                    <form method="post" asp-controller="Lead" asp-action="DeleteEstimation" onsubmit="return confirm('Delete estimation @e.Number?')" style="display:inline;">
+                                        <input type="hidden" name="leadId" value="@lead.LeadId" />
+                                        <input type="hidden" name="number" value="@e.Number" />
+                                        <button type="submit" class="fin-icon-btn danger" title="Delete"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="fin-record-detail" id="est-detail-@e.Number">
+                                <div class="info-grid">
+                                    <div class="info-item"><div class="lbl">PROJECT / REQUIREMENT</div><div class="val muted">@e.ProjectRequirement</div></div>
+                                    <div class="info-item"><div class="lbl">VALID UNTIL</div><div class="val muted">@e.ValidUntil</div></div>
+                                    <div class="info-item"><div class="lbl">DISCOUNT / TAX</div><div class="val muted">@e.Discount / @e.Tax</div></div>
+                                </div>
+                                @if (e.Items.Count > 0)
+                                {
+                                    <div class="table-wrap" style="margin-top:12px;">
+                                        <table class="data-table">
+                                            <thead><tr><th>Item / Service</th><th>Quantity</th><th>Rate</th><th>Amount</th></tr></thead>
+                                            <tbody>
+                                                @foreach (var it in e.Items)
+                                                {
+                                                    <tr><td>@it.ItemName</td><td>@it.Quantity</td><td>@it.Rate</td><td>@it.Amount</td></tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(e.TermsConditions))
+                                {
+                                    <div style="margin-top:10px;"><div class="lbl" style="font-size:11.5px;color:var(--ink-500);font-weight:600;">TERMS &amp; CONDITIONS</div><div style="font-size:13px;color:var(--ink-700);">@e.TermsConditions</div></div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(e.Notes))
+                                {
+                                    <div style="margin-top:10px;"><div class="lbl" style="font-size:11.5px;color:var(--ink-500);font-weight:600;">NOTES</div><div style="font-size:13px;color:var(--ink-700);">@e.Notes</div></div>
+                                }
+                                <div style="margin-top:10px;">
+                                    <div class="lbl" style="font-size:11.5px;color:var(--ink-500);font-weight:600;">ATTACHMENTS</div>
+                                    @if (!string.IsNullOrWhiteSpace(e.AttachmentPath))
+                                    {
+                                        <div class="fin-attach-current" style="margin-top:4px;">
+                                            <i class="bi bi-paperclip"></i>
+                                            <a href="@e.AttachmentPath" target="_blank" rel="noopener">@e.AttachmentFileName</a>
+                                            <a href="@e.AttachmentPath" download class="btn btn-soft btn-sm" style="margin-left:8px;"><i class="bi bi-download"></i> Download</a>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div style="font-size:13px;color:var(--ink-500);margin-top:4px;">No attachment</div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <script type="application/json" id="estimation-json-@e.Number">
+                        @Html.Raw(System.Text.Json.JsonSerializer.Serialize(new
+{
+    id = e.Id,
+    number = e.Number,
+    leadId = lead.LeadId,
+    date = e.Date,
+    totalAmount = e.Total,
+    items = e.Items?.Select(i => new
+    {
+        id = i.Id,
+        description = i.ItemName,
+        quantity = i.Quantity,
+        rate = i.Rate,
+        amount = i.Amount
+    }).ToList()
+}))
+
+                        </script>
+                    }
+                }
+            </div>
+
+            <!-- ===== QUOTATION SUB-TAB ===== -->
+            <div class="fin-subpanel" id="finsub-quotation">
+                <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;">
+                    <span>Quotations</span>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="newFinanceForm('quotation')">
+                        <i class="bi bi-plus-lg"></i> New Quotation
+                    </button>
+                </div>
+
+                @if (!string.IsNullOrEmpty(quotationError))
+                {
+                    <div class="form-error-banner"><i class="bi bi-exclamation-triangle-fill"></i> @quotationError</div>
+                }
+
+                <div id="quotationForm" class="fin-add-form" style="display:none;">
+                    <div class="fin-form-title" style="display:flex;align-items:center;justify-content:space-between;">
+                        <span id="quotationFormTitle">New Quotation</span>
+                        <span class="fin-number-chip" id="quotationNumberDisplay">Auto-generated on save</span>
+                    </div>
+                    <form method="post" asp-controller="Lead" asp-action="SaveQuotation" enctype="multipart/form-data">
+                        <input type="hidden" name="leadId" value="@lead.LeadId" />
+                        <input type="hidden" name="number" id="quotationEditingNumber" value="" />
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label>Date <span class="req">*</span></label>
+                                <input type="date" name="date" id="quotationDate" required value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                            </div>
+                            <div class="form-field">
+                                <label>Lead / Customer</label>
+                                <input type="text" value="@lead.LeadName (@lead.CompanyName)" readonly style="background:var(--ink-100);color:var(--ink-500);" />
+                            </div>
+                            <div class="form-field full">
+                                <label>Project / Requirement</label>
+                                <input type="text" name="projectRequirement" id="quotationProjectRequirement" list="requirementList" placeholder="e.g., MS Steel Rods supply" />
+                            </div>
+                        </div>
+
+                        <div class="divider-line"></div>
+                        <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;">
+                            <span>Items / Services</span>
+                            <button type="button" class="btn btn-outline btn-sm" onclick="addFinanceItemRow('quotationItemsBody')">
+                                <i class="bi bi-plus-lg"></i> Add Item
+                            </button>
+                        </div>
+                        <table class="fin-item-table">
+                            <thead><tr><th style="width:40%;">Item / Service</th><th>Quantity</th><th>Rate</th><th>Amount</th><th></th></tr></thead>
+                            <tbody id="quotationItemsBody"></tbody>
+                        </table>
+
+                        <div class="fin-totals">
+                            <div class="fin-totals-row"><span>Subtotal</span><span id="quotationSubtotalDisplay">0.00</span></div>
+                            <div class="fin-totals-row"><span>Discount</span><input type="number" step="0.01" min="0" name="discount" id="quotationDiscount" value="0" oninput="recalcFinanceTotals('quotationItemsBody')" /></div>
+                            <div class="fin-totals-row"><span>GST / Tax</span><input type="number" step="0.01" min="0" name="tax" id="quotationTax" value="0" oninput="recalcFinanceTotals('quotationItemsBody')" /></div>
+                            <div class="fin-totals-row grand"><span>Grand Total</span><span id="quotationTotalDisplay">0.00</span></div>
+                        </div>
+
+                        <div class="divider-line"></div>
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label>Valid Until</label>
+                                <input type="date" name="validUntil" id="quotationValidUntil" />
+                            </div>
+                            <div class="form-field">
+                                <label>Status <span class="req">*</span></label>
+                                <select name="status" id="quotationStatus" required>
+                                    @foreach (var s in LookupData.FinanceStatuses)
+                                    {
+                                        <option value="@s">@s</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-field full">
+                                <label>Terms &amp; Conditions</label>
+                                <textarea name="terms" id="quotationTerms" placeholder="Payment terms, delivery terms, validity..."></textarea>
+                            </div>
+                            <div class="form-field full">
+                                <label>Notes</label>
+                                <textarea name="notes" id="quotationNotes" placeholder="Internal notes..."></textarea>
+                            </div>
+                            <div class="form-field full">
+                                <label>Attach File</label>
+                                <div class="fin-attach-row">
+                                    <label class="btn btn-outline btn-sm fin-attach-btn" for="quotationAttachment">
+                                        <i class="bi bi-paperclip"></i> Choose File
+                                    </label>
+                                    <input type="file" name="attachment" id="quotationAttachment"
+                                           accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                                           style="display:none;" onchange="previewFinanceAttachment(this,'quotation')" />
+                                    <span id="quotationAttachmentFileName" class="fin-attach-filename">No file chosen</span>
+                                </div>
+                                <div id="quotationCurrentAttachment" class="fin-attach-current" style="display:none;">
+                                    <i class="bi bi-paperclip"></i> Current: <a href="#" id="quotationCurrentAttachmentLink" target="_blank" rel="noopener"></a>
+                                    <span class="hint">(uploading a new file will replace this)</span>
+                                </div>
+                                <div class="hint" style="margin-top:4px;">PDF, DOC, DOCX, XLS, XLSX, JPG, JPEG, PNG — up to 10 MB.</div>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-outline" onclick="cancelFinanceForm('quotation')">Cancel</button>
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Save Quotation</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="divider-line"></div>
+                <div class="section-title">Saved Quotations</div>
+                @if (lead.Quotations.Count == 0)
+                {
+                    <div class="empty-state"><i class="bi bi-file-earmark-text"></i><p>No quotations created yet.</p></div>
+                }
+                else
+                {
+                    @foreach (var q in lead.Quotations.AsEnumerable().Reverse())
+                    {
+                        <div class="fin-record-card">
+                            <div class="fin-record-head">
+                                <div class="fin-record-main">
+                                    <span class="fin-record-num">@q.Number</span>
+                                    <span class="fin-record-sub">@q.Date</span>
+                                    <span class="badge-status st-new">@q.Status</span>
+                                    <span class="fin-record-amt">₹@q.GrandTotal</span>
+                                </div>
+                                <div class="fin-record-actions">
+                                    <button type="button" class="fin-icon-btn" title="View" onclick="toggleFinanceDetail('quo-detail-@q.Number')"><i class="bi bi-eye"></i></button>
+                                    <button type="button" class="fin-icon-btn" title="Edit" onclick="editFinanceRecord('quotation','@q.Number')"><i class="bi bi-pencil"></i></button>
+                                    <form method="post" asp-controller="Lead" asp-action="DeleteQuotation" onsubmit="return confirm('Delete quotation @q.Number?')" style="display:inline;">
+                                        <input type="hidden" name="leadId" value="@lead.LeadId" />
+                                        <input type="hidden" name="number" value="@q.Number" />
+                                        <button type="submit" class="fin-icon-btn danger" title="Delete"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="fin-record-detail" id="quo-detail-@q.Number">
+                                <div class="info-grid">
+                                    <div class="info-item"><div class="lbl">PROJECT / REQUIREMENT</div><div class="val muted">@q.ProjectRequirement</div></div>
+                                    <div class="info-item"><div class="lbl">VALID UNTIL</div><div class="val muted">@q.ValidUntil</div></div>
+                                    <div class="info-item"><div class="lbl">DISCOUNT / TAX</div><div class="val muted">@q.Discount / @q.Tax</div></div>
+                                </div>
+                                @if (q.Items.Count > 0)
+                                {
+                                    <div class="table-wrap" style="margin-top:12px;">
+                                        <table class="data-table">
+                                            <thead><tr><th>Item / Service</th><th>Quantity</th><th>Rate</th><th>Amount</th></tr></thead>
+                                            <tbody>
+                                                @foreach (var it in q.Items)
+                                                {
+                                                    <tr><td>@it.ItemName</td><td>@it.Quantity</td><td>@it.Rate</td><td>@it.Amount</td></tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(q.TermsConditions))
+                                {
+                                    <div style="margin-top:10px;"><div class="lbl" style="font-size:11.5px;color:var(--ink-500);font-weight:600;">TERMS &amp; CONDITIONS</div><div style="font-size:13px;color:var(--ink-700);">@q.TermsConditions</div></div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(q.Notes))
+                                {
+                                    <div style="margin-top:10px;"><div class="lbl" style="font-size:11.5px;color:var(--ink-500);font-weight:600;">NOTES</div><div style="font-size:13px;color:var(--ink-700);">@q.Notes</div></div>
+                                }
+                                <div style="margin-top:10px;">
+                                    <div class="lbl" style="font-size:11.5px;color:var(--ink-500);font-weight:600;">ATTACHMENTS</div>
+                                    @if (!string.IsNullOrWhiteSpace(q.AttachmentPath))
+                                    {
+                                        <div class="fin-attach-current" style="margin-top:4px;">
+                                            <i class="bi bi-paperclip"></i>
+                                            <a href="@q.AttachmentPath" target="_blank" rel="noopener">@q.AttachmentFileName</a>
+                                            <a href="@q.AttachmentPath" download class="btn btn-soft btn-sm" style="margin-left:8px;"><i class="bi bi-download"></i> Download</a>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div style="font-size:13px;color:var(--ink-500);margin-top:4px;">No attachment</div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <script type="application/json" id="quotation-json-@q.Number">@Html.Raw(System.Text.Json.JsonSerializer.Serialize(q))</script>
+                    }
+                }
+            </div>
+
+            <!-- ===== PROPOSAL SUB-TAB ===== -->
+            <div class="fin-subpanel" id="finsub-proposal">
+                <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;">
+                    <span>Proposals</span>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="newFinanceForm('proposal')">
+                        <i class="bi bi-plus-lg"></i> New Proposal
+                    </button>
+                </div>
+
+                @if (!string.IsNullOrEmpty(proposalError))
+                {
+                    <div class="form-error-banner"><i class="bi bi-exclamation-triangle-fill"></i> @proposalError</div>
+                }
+
+                <div id="proposalForm" class="fin-add-form" style="display:none;">
+                    <div class="fin-form-title" style="display:flex;align-items:center;justify-content:space-between;">
+                        <span id="proposalFormTitle">New Proposal</span>
+                        <span class="fin-number-chip" id="proposalNumberDisplay">Auto-generated on save</span>
+                    </div>
+                    <form method="post" asp-controller="Lead" asp-action="SaveProposal" enctype="multipart/form-data">
+                        <input type="hidden" name="leadId" value="@lead.LeadId" />
+                        <input type="hidden" name="number" id="proposalEditingNumber" value="" />
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label>Date <span class="req">*</span></label>
+                                <input type="date" name="date" id="proposalDate" required value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                            </div>
+                            <div class="form-field">
+                                <label>Lead / Customer</label>
+                                <input type="text" value="@lead.LeadName (@lead.CompanyName)" readonly style="background:var(--ink-100);color:var(--ink-500);" />
+                            </div>
+                            <div class="form-field full">
+                                <label>Project / Requirement</label>
+                                <input type="text" name="projectRequirement" id="proposalProjectRequirement" list="requirementList" placeholder="e.g., MS Steel Rods supply" />
+                            </div>
+                            <div class="form-field full">
+                                <label>Title <span class="req">*</span></label>
+                                <input type="text" name="title" id="proposalTitle" required placeholder="e.g., Annual Maintenance Contract Proposal" />
+                            </div>
+                            <div class="form-field full">
+                                <label>Scope of Work</label>
+                                <textarea name="scopeOfWork" id="proposalScopeOfWork" placeholder="What's covered under this proposal..."></textarea>
+                            </div>
+                            <div class="form-field full">
+                                <label>Description</label>
+                                <textarea name="description" id="proposalDescription" placeholder="Detailed description..."></textarea>
+                            </div>
+                            <div class="form-field full">
+                                <label>Deliverables</label>
+                                <textarea name="deliverables" id="proposalDeliverables" placeholder="Key deliverables..."></textarea>
+                            </div>
+                            <div class="form-field">
+                                <label>Timeline</label>
+                                <input type="text" name="timeline" id="proposalTimeline" placeholder="e.g., 6 weeks from approval" />
+                            </div>
+                            <div class="form-field">
+                                <label>Budget</label>
+                                <input type="number" name="budget" id="proposalBudget" min="0" step="0.01" placeholder="e.g., 500000" />
+                            </div>
+                            <div class="form-field">
+                                <label>Status <span class="req">*</span></label>
+                                <select name="status" id="proposalStatus" required>
+                                    @foreach (var s in LookupData.FinanceStatuses)
+                                    {
+                                        <option value="@s">@s</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-field"></div>
+                            <div class="form-field full">
+                                <label>Terms &amp; Conditions</label>
+                                <textarea name="terms" id="proposalTerms" placeholder="Payment terms, validity..."></textarea>
+                            </div>
+                            <div class="form-field full">
+                                <label>Notes</label>
+                                <textarea name="notes" id="proposalNotes" placeholder="Internal notes..."></textarea>
+                            </div>
+                            <div class="form-field full">
+                                <label>Attach File</label>
+                                <div class="fin-attach-row">
+                                    <label class="btn btn-outline btn-sm fin-attach-btn" for="proposalAttachment">
+                                        <i class="bi bi-paperclip"></i> Choose File
+                                    </label>
+                                    <input type="file" name="attachment" id="proposalAttachment"
+                                           accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                                           style="display:none;" onchange="previewFinanceAttachment(this,'proposal')" />
+                                    <span id="proposalAttachmentFileName" class="fin-attach-filename">No file chosen</span>
+                                </div>
+                                <div id="proposalCurrentAttachment" class="fin-attach-current" style="display:none;">
+                                    <i class="bi bi-paperclip"></i> Current: <a href="#" id="proposalCurrentAttachmentLink" target="_blank" rel="noopener"></a>
+                                    <span class="hint">(uploading a new file will replace this)</span>
+                                </div>
+                                <div class="hint" style="margin-top:4px;">PDF, DOC, DOCX, XLS, XLSX, JPG, JPEG, PNG — up to 10 MB.</div>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-outline" onclick="cancelFinanceForm('proposal')">Cancel</button>
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Save Proposal</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="divider-line"></div>
+                <div class="section-title">Saved Proposals</div>
+                @if (lead.Proposals.Count == 0)
+                {
+                    <div class="empty-state"><i class="bi bi-file-earmark-richtext"></i><p>No proposals created yet.</p></div>
+                }
+                else
+                {
+                    @foreach (var p in lead.Proposals.AsEnumerable().Reverse())
+                    {
+                        <div class="fin-record-card">
+                            <div class="fin-record-head">
+                                <div class="fin-record-main">
+                                    <span class="fin-record-num">@p.Number</span>
+                                    <span class="fin-record-sub">@p.Date</span>
+                                    <span class="badge-status st-new">@p.Status</span>
+                                    <span style="font-weight:700;font-size:13.5px;">@p.Title</span>
+                                </div>
+                                <div class="fin-record-actions">
+                                    <button type="button" class="fin-icon-btn" title="View" onclick="toggleFinanceDetail('pro-detail-@p.Number')"><i class="bi bi-eye"></i></button>
+                                    <button type="button" class="fin-icon-btn" title="Edit" onclick="editFinanceRecord('proposal','@p.Number')"><i class="bi bi-pencil"></i></button>
+                                    <form method="post" asp-controller="Lead" asp-action="DeleteProposal" onsubmit="return confirm('Delete proposal @p.Number?')" style="display:inline;">
+                                        <input type="hidden" name="leadId" value="@lead.LeadId" />
+                                        <input type="hidden" name="number" value="@p.Number" />
+                                        <button type="submit" class="fin-icon-btn danger" title="Delete"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="fin-record-detail" id="pro-detail-@p.Number">
+                                <div class="info-grid">
+                                    <div class="info-item"><div class="lbl">PROJECT / REQUIREMENT</div><div class="val muted">@p.ProjectRequirement</div></div>
+                                    <div class="info-item"><div class="lbl">TIMELINE</div><div class="val muted">@p.Timeline</div></div>
+                                    <div class="info-item"><div class="lbl">BUDGET</div><div class="val muted">@p.Budget</div></div>
+                                </div>
+                                @if (!string.IsNullOrWhiteSpace(p.ScopeOfWork))
+                                {
+                                    <div style="margin-top:10px;"><div class="lbl" style="font-size:11.5px;color:var(--ink-500);font-weight:600;">SCOPE OF WORK</div><div style="font-size:13px;color:var(--ink-700);">@p.ScopeOfWork</div></div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(p.Description))
+                                {
+                                    <div style="margin-top:10px;"><div class="lbl" style="font-size:11.5px;color:var(--ink-500);font-weight:600;">DESCRIPTION</div><div style="font-size:13px;color:var(--ink-700);">@p.Description</div></div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(p.Deliverables))
+                                {
+                                    <div style="margin-top:10px;"><div class="lbl" style="font-size:11.5px;color:var(--ink-500);font-weight:600;">DELIVERABLES</div><div style="font-size:13px;color:var(--ink-700);">@p.Deliverables</div></div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(p.TermsConditions))
+                                {
+                                    <div style="margin-top:10px;"><div class="lbl" style="font-size:11.5px;color:var(--ink-500);font-weight:600;">TERMS &amp; CONDITIONS</div><div style="font-size:13px;color:var(--ink-700);">@p.TermsConditions</div></div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(p.Notes))
+                                {
+                                    <div style="margin-top:10px;"><div class="lbl" style="font-size:11.5px;color:var(--ink-500);font-weight:600;">NOTES</div><div style="font-size:13px;color:var(--ink-700);">@p.Notes</div></div>
+                                }
+                                <div style="margin-top:10px;">
+                                    <div class="lbl" style="font-size:11.5px;color:var(--ink-500);font-weight:600;">ATTACHMENTS</div>
+                                    @if (!string.IsNullOrWhiteSpace(p.AttachmentPath))
+                                    {
+                                        <div class="fin-attach-current" style="margin-top:4px;">
+                                            <i class="bi bi-paperclip"></i>
+                                            <a href="@p.AttachmentPath" target="_blank" rel="noopener">@p.AttachmentFileName</a>
+                                            <a href="@p.AttachmentPath" download class="btn btn-soft btn-sm" style="margin-left:8px;"><i class="bi bi-download"></i> Download</a>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div style="font-size:13px;color:var(--ink-500);margin-top:4px;">No attachment</div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <script type="application/json" id="proposal-json-@p.Number">@Html.Raw(System.Text.Json.JsonSerializer.Serialize(p))</script>
+                    }
+                }
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<datalist id="requirementList">
+    @foreach (var r in lead.Requirements)
+    {
+        <option value="@r.Title"></option>
+    }
+</datalist>
+
+<!-- ============ LEAD INFORMATION — immediately below the tab content ============ -->
+<div class="panel" style="margin-bottom:22px;">
+    <div class="panel-header">
+        <div>
+            <h2>Lead Information</h2>
+            <div class="hint">Complete profile and contact details</div>
+        </div>
+    </div>
+    <div class="panel-body">
+        <div class="info-grid">
+            <div class="info-item"><div class="lbl">LEAD NAME</div><div class="val">@lead.LeadName</div></div>
+            <div class="info-item"><div class="lbl">COMPANY NAME</div><div class="val">@lead.CompanyName</div></div>
+            <div class="info-item"><div class="lbl">MOBILE NUMBER</div><div class="val">@lead.MobileNumber</div></div>
+            <div class="info-item"><div class="lbl">EMAIL</div><div class="val">@lead.Email</div></div>
+            <div class="info-item"><div class="lbl">DESIGNATION</div><div class="val muted">@lead.Designation</div></div>
+            <div class="info-item"><div class="lbl">LOCATION</div><div class="val muted">@lead.Location</div></div>
+            <div class="info-item"><div class="lbl">LEAD SOURCE</div><div class="val muted">@lead.Source</div></div>
+            <div class="info-item"><div class="lbl">LEAD STATUS</div><div class="val">@Html.Raw(StatusBadge(lead.LeadStatus))</div></div>
+            <div class="info-item"><div class="lbl">ASSIGNED EMPLOYEE</div>
+                <div class="val">
+                    <div class="avatar-chip"><div class="initials">@Initials(lead.AssignedTo)</div><span>@lead.AssignedTo</span></div>
+                </div>
+            </div>
+            <div class="info-item"><div class="lbl">CREATED DATE</div><div class="val muted">@lead.CreatedDate</div></div>
+            <div class="info-item"><div class="lbl">FOLLOW-UP DATE</div><div class="val muted">@lead.FollowUpDate</div></div>
+            <div class="info-item"><div class="lbl">REMARKS</div><div class="val muted">@lead.Remarks</div></div>
+        </div>
+    </div>
+</div>
+
+@if (lead.Visits.Count > 0)
+{
+    <div class="panel">
+        <div class="panel-header">
+            <div>
+                <h2>Visit History</h2>
+                <div class="hint">Complete record of in-person visits for this lead</div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Visit Date</th><th>Visit Time</th><th>Visit Location</th><th>Salesperson</th>
+                            <th>Conversation</th><th>Result / Outcome</th><th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var v in lead.Visits)
+                        {
+                            <tr>
+                                <td>@v.VisitDate</td>
+                                <td>@v.VisitTime</td>
+                                <td style="max-width:220px;">@v.VisitLocation</td>
+                                <td>@v.Employee</td>
+                                <td style="max-width:260px;">@v.Conversation</td>
+                                <td>
+                                    @{
+                                        var outCls = v.Outcome switch
+                                        {
+                                            "Interested" => "st-qualified",
+                                            "Deal Closed" => "st-won",
+                                            "Not Interested" => "st-lost",
+                                            _ => "st-proposalsent"
+                                        };
+                                    }
+                                    <span class="badge-status @outCls">@v.Outcome</span>
+                                </td>
+                                <td style="max-width:220px;">@v.Remarks</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        (function () {
+            var initialTab = '@activeTab';
+            var initialFinanceSubTab = '@activeFinanceSubTab';
+            var hasRequirementError = @(string.IsNullOrEmpty(requirementError) ? "false" : "true");
+
+            function activate() {
+                switchLeadTab(initialTab);
+                switchFinanceSubTab(initialFinanceSubTab);
+                if (hasRequirementError) {
+                    switchLeadTab('requirement');
+                    toggleRequirementForm();
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', activate);
+            } else {
+                // DOM already parsed (script executing after content) — run immediately.
+                activate();
+            }
+        })();
+    </script>
+}
+
+@functions {
+    string StatusBadge(string status)
+    {
+        var cls = status.ToLower().Replace(" ", "") switch
+        {
+            "new" => "st-new",
+            "contacted" => "st-contacted",
+            "qualified" => "st-qualified",
+            "proposalsent" => "st-proposalsent",
+            "negotiation" => "st-negotiation",
+            "won" => "st-won",
+            "lost" => "st-lost",
+            _ => "st-new"
+        };
+        return $"<span class='badge-status {cls}'>{status}</span>";
+    }
+
+    string FollowUpStatusBadge(string status)
+    {
+        var cls = status switch { "Completed" => "st-won", "Rescheduled" => "st-proposalsent", _ => "st-new" };
+        return $"<span class='badge-status {cls}'>{status}</span>";
+    }
+
+    string Initials(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return "—";
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length >= 2 ? $"{parts[0][0]}{parts[1][0]}" : name.Substring(0, Math.Min(2, name.Length));
+    }
+}

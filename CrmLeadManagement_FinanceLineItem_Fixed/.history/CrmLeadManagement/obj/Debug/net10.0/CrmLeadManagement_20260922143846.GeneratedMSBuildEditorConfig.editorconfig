@@ -1,0 +1,108 @@
+is_global = true
+build_property.TargetFramework = net10.0
+build_property.TargetFramework = net10.0
+build_property.TargetPlatformMinVersion = 
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.TargetFrameworkIdentifier = .NETCoreApp
+build_property.TargetFrameworkVersion = v10.0
+build_property.EntryPointFilePath = 
+build_property.RootNamespace = CrmLeadManagement
+build_property.RootNamespace = CrmLeadManagement
+build_property.ProjectDir = C:\Users\admin\Downloads\CrmLeadManagement_FinanceLineItem_Fixed\.history\CrmLeadManagement\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 10.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\admin\Downloads\CrmLeadManagement_FinanceLineItem_Fixed\.history\CrmLeadManagement
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 10.0
+build_property.EnableCodeStyleSeverity = 
+
+[C:/Users/admin/Downloads/CrmLeadManagement_FinanceLineItem_Fixed/.history/CrmLeadManagement/Views/Lead/Details_20260921122832.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGVhZFxEZXRhaWxzXzIwMjYwOTIxMTIyODMyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/admin/Downloads/CrmLeadManagement_FinanceLineItem_Fixed/.history/CrmLeadManagement/Views/Lead/Details_20260921145139.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGVhZFxEZXRhaWxzXzIwMjYwOTIxMTQ1MTM5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/admin/Downloads/CrmLeadManagement_FinanceLineItem_Fixed/.history/CrmLeadManagement/Views/Lead/Details_20260921145154.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGVhZFxEZXRhaWxzXzIwMjYwOTIxMTQ1MTU0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/admin/Downloads/CrmLeadManagement_FinanceLineItem_Fixed/.history/CrmLeadManagement/Views/Lead/Details_20260921145213.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGVhZFxEZXRhaWxzXzIwMjYwOTIxMTQ1MjEzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/admin/Downloads/CrmLeadManagement_FinanceLineItem_Fixed/.history/CrmLeadManagement/Views/Lead/Details_20260921145233.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGVhZFxEZXRhaWxzXzIwMjYwOTIxMTQ1MjMzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/admin/Downloads/CrmLeadManagement_FinanceLineItem_Fixed/.history/CrmLeadManagement/Views/Lead/Details_20260921145309.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGVhZFxEZXRhaWxzXzIwMjYwOTIxMTQ1MzA5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/admin/Downloads/CrmLeadManagement_FinanceLineItem_Fixed/.history/CrmLeadManagement/Views/Lead/Details_20260921150839.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGVhZFxEZXRhaWxzXzIwMjYwOTIxMTUwODM5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/admin/Downloads/CrmLeadManagement_FinanceLineItem_Fixed/.history/CrmLeadManagement/Views/Lead/Details_20260921150851.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGVhZFxEZXRhaWxzXzIwMjYwOTIxMTUwODUxLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/admin/Downloads/CrmLeadManagement_FinanceLineItem_Fixed/.history/CrmLeadManagement/Views/Lead/Details_20260921150923.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGVhZFxEZXRhaWxzXzIwMjYwOTIxMTUwOTIzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/admin/Downloads/CrmLeadManagement_FinanceLineItem_Fixed/.history/CrmLeadManagement/Views/Lead/Details_20260921150928.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGVhZFxEZXRhaWxzXzIwMjYwOTIxMTUwOTI4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/admin/Downloads/CrmLeadManagement_FinanceLineItem_Fixed/.history/CrmLeadManagement/Views/Lead/List_20260921165838.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGVhZFxMaXN0XzIwMjYwOTIxMTY1ODM4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/admin/Downloads/CrmLeadManagement_FinanceLineItem_Fixed/.history/CrmLeadManagement/Views/Lead/List_20260921170325.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGVhZFxMaXN0XzIwMjYwOTIxMTcwMzI1LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/admin/Downloads/CrmLeadManagement_FinanceLineItem_Fixed/.history/CrmLeadManagement/Views/Settings/Index_20260921122832.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2V0dGluZ3NcSW5kZXhfMjAyNjA5MjExMjI4MzIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/admin/Downloads/CrmLeadManagement_FinanceLineItem_Fixed/.history/CrmLeadManagement/Views/Settings/Index_20260921165741.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2V0dGluZ3NcSW5kZXhfMjAyNjA5MjExNjU3NDEuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/admin/Downloads/CrmLeadManagement_FinanceLineItem_Fixed/.history/CrmLeadManagement/Views/Settings/Index_20260921165742.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2V0dGluZ3NcSW5kZXhfMjAyNjA5MjExNjU3NDIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/admin/Downloads/CrmLeadManagement_FinanceLineItem_Fixed/.history/CrmLeadManagement/Views/Shared/_Layout_20260921122832.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXRfMjAyNjA5MjExMjI4MzIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/admin/Downloads/CrmLeadManagement_FinanceLineItem_Fixed/.history/CrmLeadManagement/Views/Shared/_Layout_20260921170031.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXRfMjAyNjA5MjExNzAwMzEuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/admin/Downloads/CrmLeadManagement_FinanceLineItem_Fixed/.history/CrmLeadManagement/Views/Shared/_Layout_20260921170036.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXRfMjAyNjA5MjExNzAwMzYuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/admin/Downloads/CrmLeadManagement_FinanceLineItem_Fixed/.history/CrmLeadManagement/Views/Shared/_Layout_20260921170450.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXRfMjAyNjA5MjExNzA0NTAuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 

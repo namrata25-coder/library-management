@@ -1,0 +1,229 @@
+@model CrmLeadManagement.Models.SettingsViewModel
+
+<div class="breadcrumb-row">
+    <a asp-controller="Home" asp-action="Index">Home</a><span class="sep">/</span><span class="current">Settings</span>
+</div>
+<div class="page-head">
+    <div>
+        <h1>Settings</h1>
+        <p>Configure the lookup values and workflow rules used across NimbusCRM.</p>
+    </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:22px;">
+
+    <!-- ============ LEAD STATUS ============ -->
+    <div class="panel" id="lead-status">
+        <div class="panel-header">
+            <div>
+                <h2><i class="bi bi-flag" style="color:var(--brand-600);margin-right:6px;"></i> Lead Status</h2>
+                <div class="hint">Statuses available across the Lead List, Assigned List and Lead Details</div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <form method="post" asp-controller="Settings" asp-action="AddStatus" style="display:flex;gap:10px;margin-bottom:18px;">
+                <input type="text" name="NewStatus" placeholder="e.g., Re-engaged" required
+                       style="flex:1;border:1px solid var(--ink-300);border-radius:8px;padding:9px 12px;font-size:13.5px;" />
+                <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i> Add</button>
+            </form>
+
+            <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                @foreach (var s in Model.Statuses)
+                {
+                    <div style="display:flex;align-items:center;gap:8px;background:var(--ink-100);border-radius:20px;padding:6px 8px 6px 14px;font-size:13px;font-weight:600;color:var(--ink-700);">
+                        <span>@s</span>
+                        <form method="post" asp-controller="Settings" asp-action="RemoveStatus" style="display:inline;">
+                            <input type="hidden" name="status" value="@s" />
+                            <button type="submit" class="icon-btn" style="width:24px;height:24px;border:none;background:transparent;color:var(--ink-500);" title="Remove">
+                                <i class="bi bi-x-lg" style="font-size:11px;"></i>
+                            </button>
+                        </form>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ LEAD SOURCES ============ -->
+    <div class="panel" id="lead-sources">
+        <div class="panel-header">
+            <div>
+                <h2><i class="bi bi-signpost-split" style="color:var(--accent);margin-right:6px;"></i> Lead Sources</h2>
+                <div class="hint">Where leads are coming from</div>
+            </div>
+        </div>
+        <div class="panel-body">
+            <form method="post" asp-controller="Settings" asp-action="AddSource" style="display:flex;gap:10px;margin-bottom:18px;">
+                <input type="text" name="NewSource" placeholder="e.g., LinkedIn Ads" required
+                       style="flex:1;border:1px solid var(--ink-300);border-radius:8px;padding:9px 12px;font-size:13.5px;" />
+                <button type="submit" class="btn btn-accent btn-sm"><i class="bi bi-plus-lg"></i> Add</button>
+            </form>
+
+            <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                @foreach (var s in Model.Sources)
+                {
+                    <div style="display:flex;align-items:center;gap:8px;background:var(--ink-100);border-radius:20px;padding:6px 8px 6px 14px;font-size:13px;font-weight:600;color:var(--ink-700);">
+                        <span>@s</span>
+                        <form method="post" asp-controller="Settings" asp-action="RemoveSource" style="display:inline;">
+                            <input type="hidden" name="source" value="@s" />
+                            <button type="submit" class="icon-btn" style="width:24px;height:24px;border:none;background:transparent;color:var(--ink-500);" title="Remove">
+                                <i class="bi bi-x-lg" style="font-size:11px;"></i>
+                            </button>
+                        </form>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ============ USERS / ROLES ============ -->
+<div class="panel" id="users-roles" style="margin-bottom:22px;">
+    <div class="panel-header">
+        <div>
+            <h2><i class="bi bi-people" style="color:var(--brand-600);margin-right:6px;"></i> Users &amp; Roles</h2>
+            <div class="hint">Team members who can be assigned leads</div>
+        </div>
+        <button type="button" class="btn btn-primary btn-sm" onclick="openModal('addUserModal')"><i class="bi bi-person-plus"></i> Add User</button>
+    </div>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var u in Model.Users)
+                {
+                    <tr>
+                        <td>
+                            <div class="avatar-chip">
+                                <div class="initials">@Initials(u.Name)</div>
+                                <span class="cell-primary">@u.Name</span>
+                            </div>
+                        </td>
+                        <td>@u.Email</td>
+                        <td>@u.Role</td>
+                        <td>
+                            @if (u.Status == "Active")
+                            {
+                                <span class="badge-status st-qualified">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge-status st-lost">Inactive</span>
+                            }
+                        </td>
+                        <td>
+                            <form method="post" asp-controller="Settings" asp-action="RemoveUser"
+                                  onsubmit="return confirm('Remove @u.Name from the team?')">
+                                <input type="hidden" name="email" value="@u.Email" />
+                                <button type="submit" class="icon-btn" title="Remove" style="color:#c81e1e;border-color:#fda29b;">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ============ FOLLOW-UP SETTINGS ============ -->
+<div class="panel" id="followup-settings">
+    <div class="panel-header">
+        <div>
+            <h2><i class="bi bi-calendar-check" style="color:var(--accent);margin-right:6px;"></i> Follow-up Settings</h2>
+            <div class="hint">Defaults and reminder rules used when scheduling follow-ups</div>
+        </div>
+    </div>
+    <div class="panel-body">
+        <form method="post" asp-controller="Settings" asp-action="SaveFollowUp">
+            <div class="form-grid">
+                <div class="form-field">
+                    <label>Default Follow-up Type</label>
+                    <select name="FollowUpInput.DefaultFollowUpType">
+                        @foreach (var t in LookupData.FollowUpTypes)
+                        {
+                            @if (t == Model.FollowUp.DefaultFollowUpType)
+                            {
+                                <option selected>@t</option>
+                            }
+                            else
+                            {
+                                <option>@t</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label>Reminder — Days Before Follow-up</label>
+                    <input type="number" min="0" max="14" name="FollowUpInput.DefaultReminderDaysBefore" value="@Model.FollowUp.DefaultReminderDaysBefore" />
+                </div>
+                <div class="form-field">
+                    <label>Auto-escalate After (days overdue)</label>
+                    <input type="number" min="0" max="30" name="FollowUpInput.AutoEscalateAfterDaysOverdue" value="@Model.FollowUp.AutoEscalateAfterDaysOverdue" />
+                </div>
+                <div class="form-field">
+                    <label>Notification Channels</label>
+                    <div style="display:flex;gap:18px;align-items:center;height:100%;padding-top:6px;">
+                        <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:500;color:var(--ink-700);">
+                            <input type="checkbox" name="FollowUpInput.EnableEmailReminders" value="true" @(Model.FollowUp.EnableEmailReminders ? "checked" : "") style="width:16px;height:16px;" />
+                            <input type="hidden" name="FollowUpInput.EnableEmailReminders" value="false" />
+                            Email
+                        </label>
+                        <label style="display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:500;color:var(--ink-700);">
+                            <input type="checkbox" name="FollowUpInput.EnableSmsReminders" value="true" @(Model.FollowUp.EnableSmsReminders ? "checked" : "") style="width:16px;height:16px;" />
+                            <input type="hidden" name="FollowUpInput.EnableSmsReminders" value="false" />
+                            SMS
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Save Follow-up Settings</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ============ ADD USER MODAL ============ -->
+<div class="modal-backdrop-custom" id="addUserModal">
+    <div class="modal-box">
+        <div class="modal-box-head">
+            <div>
+                <h3><i class="bi bi-person-plus-fill" style="color:var(--brand-600);"></i> Add User</h3>
+                <p>New team member who can be assigned leads</p>
+            </div>
+            <button class="modal-close" type="button" onclick="closeModal('addUserModal')">&times;</button>
+        </div>
+        <div class="modal-box-body">
+            <form method="post" asp-controller="Settings" asp-action="AddUser">
+                <div class="form-grid">
+                    <div class="form-field"><label>Full Name <span class="req">*</span></label><input type="text" name="NewUser.Name" required placeholder="e.g., Isha Patil" /></div>
+                    <div class="form-field"><label>Email <span class="req">*</span></label><input type="email" name="NewUser.Email" required placeholder="name@nimbuscrm.com" /></div>
+                    <div class="form-field"><label>Role</label><input type="text" name="NewUser.Role" placeholder="e.g., Sales Executive" /></div>
+                    <div class="form-field">
+                        <label>Status</label>
+                        <select name="NewUser.Status">
+                            <option selected>Active</option>
+                            <option>Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('addUserModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Add User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@functions {
+    string Initials(string name)
+    {
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length >= 2 ? $"{parts[0][0]}{parts[1][0]}" : name.Substring(0, Math.Min(2, name.Length));
+    }
+}

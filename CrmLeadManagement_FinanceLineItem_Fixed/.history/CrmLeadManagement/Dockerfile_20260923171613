@@ -1,0 +1,30 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+# Install Kerberos library (fixes lib gs s api_krb5.so.2 error)
+RUN apt-get update && apt-get install -y lib g s s api-krb5-2 && rm -rf /var/lib/apt/lists/*
+
+# Copy csproj and restore
+COPY ["CrmLeadManagement.csproj", "./"]
+RUN dotnet restore "CrmLeadManagement.csproj"
+
+# Copy everything else and publish
+COPY . .
+RUN dotnet publish "CrmLeadManagement.csproj" \
+    -c Release \
+    -o /app/publish \
+    /p:UseAppHost=false
+
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+WORKDIR /app
+
+# Install Kerberos in runtime image too (this is where the error usually occurs)
+RUN apt-get update && apt-get install -y lib gs s api-krb5-2 && rm -rf /var/lib/apt/lists/*
+
+COPY --from=build /app/publish .
+
+ENV ASP NET CORE_URLS=http://+:10000
+EXPOSE 10000
+
+ENTRYPOINT ["dotnet", "CrmLeadManagement.dll"]

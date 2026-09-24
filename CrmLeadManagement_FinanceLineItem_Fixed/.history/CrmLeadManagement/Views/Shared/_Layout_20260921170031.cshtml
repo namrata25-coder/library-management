@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] · NimbusCRM</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="mark">N</div>
+                <div>
+                    <div class="name">CRM</div>
+                    <div class="sub">Lead Management</div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="sidebar-section-label">LEADS</div>
+                <a class="sidebar-link @(ViewData["ActivePage"] as string == "LeadList" ? "active" : "")" asp-controller="Lead" asp-action="List">
+                    <i class="bi bi-person-lines-fill"></i> Lead List
+                </a>
+                <a class="sidebar-link @(ViewData["ActivePage"] as string == "AssignedList" ? "active" : "")" asp-controller="Lead" asp-action="Assigned">
+                    <i class="bi bi-diagram-3"></i> Assigned Leads
+                </a>
+
+                @{
+                    var activePage = ViewData["ActivePage"] as string ?? "";
+                    var financeActive = activePage.StartsWith("Finance");
+                }
+                <div class="sidebar-section-label">WORKSPACE</div>
+                <a class="sidebar-link" asp-controller="Settings" asp-action="Index" asp-fragment="users-roles"><i class="bi bi-people"></i> Team</a>
+                <a class="sidebar-link @(activePage == "Settings" ? "active" : "")" asp-controller="Settings" asp-action="Index">
+                    <i class="bi bi-gear"></i> Settings
+                </a>
+                <div class="sidebar-group @(financeActive ? "open" : "")">
+                    <button type="button" class="sidebar-link sidebar-group-toggle @(financeActive ? "active" : "")" onclick="this.parentElement.classList.toggle('open')">
+                        <i class="bi bi-cash-coin"></i> Finance
+                        <i class="bi bi-chevron-down sidebar-caret"></i>
+                    </button>
+                    <div class="sidebar-submenu">
+                        <a class="sidebar-sublink @(activePage == "FinanceEstimation" ? "active" : "")" asp-controller="Finance" asp-action="EstimationList">
+                            <i class="bi bi-calculator"></i> Estimation List
+                        </a>
+                        <a class="sidebar-sublink @(activePage == "FinanceQuotation" ? "active" : "")" asp-controller="Finance" asp-action="QuotationList">
+                            <i class="bi bi-file-earmark-text"></i> Quotation List
+                        </a>
+                        <a class="sidebar-sublink @(activePage == "FinanceProposal" ? "active" : "")" asp-controller="Finance" asp-action="ProposalList">
+                            <i class="bi bi-file-earmark-richtext"></i> Proposal List
+                        </a>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="sidebar-foot">
+                <div class="avatar">AS</div>
+                <div>
+                    <div class="who">Ananya Sharma</div>
+                    <div class="role">Sales Manager</div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="main-col">
+            <header class="topbar">
+                <div class="search-box">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="Search leads, companies, contacts..." />
+                </div>
+                <div class="topbar-right">
+                    <div class="topbar-icon"><i class="bi bi-bell"></i><span class="dot"></span></div>
+                    <div class="topbar-icon"><i class="bi bi-envelope"></i></div>
+                    <div style="width:1px;height:26px;background:var(--line);"></div>
+                    <div class="avatar-chip">
+                        <div class="initials">AS</div>
+                        <div>
+                            <div style="font-size:13px;font-weight:600;">Ananya Sharma</div>
+                            <div style="font-size:11.5px;color:var(--ink-500);">Sales Manager</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="page-body">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <script src="~/js/site.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
