@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lifeline Hospital — Pure Ayurvedic Care</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,500&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pine:#16302A;
+    --pine-deep:#0E211C;
+    --clay:#A13D2C;
+    --clay-dim:#8B3325;
+    --turmeric:#C99A3D;
+    --turmeric-soft:#E4C378;
+    --ivory:#FBF7EF;
+    --card:#FFFFFF;
+    --sand:#F1EAD8;
+    --ink:#221F1A;
+    --ink-soft:#6B6357;
+    --line:#E4DCC8;
+    --ok:#3E7A4F;
+    --warn:#B4522C;
+    --radius:14px;
+    --shadow: 0 8px 30px rgba(22,48,42,0.08);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--ivory);
+    color:var(--ink);
+    font-family:'Work Sans',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{
+    font-family:'Fraunces',serif;
+    margin:0;
+    color:var(--pine-deep);
+    letter-spacing:-0.01em;
+  }
+  a{color:inherit;text-decoration:none;}
+  img{max-width:100%;display:block;}
+  button{font-family:inherit;cursor:pointer;}
+  :focus-visible{outline:3px solid var(--turmeric); outline-offset:2px;}
+
+  /* ---------- pulse-leaf divider (signature element) ---------- */
+  .pulse-divider{width:100%;height:34px;display:flex;align-items:center;justify-content:center;margin:6px 0;}
+  .pulse-divider svg{width:220px;height:34px;}
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    background:var(--pine-deep);
+    color:#EFE7D2;
+    font-size:13px;
+    padding:7px 24px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:6px;
+  }
+  .topbar a{display:inline-flex;align-items:center;gap:6px;color:#EFE7D2;}
+  .topbar .tb-right{display:flex;gap:20px;flex-wrap:wrap;}
+
+  /* ---------- nav ---------- */
+  nav.mainnav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(251,247,239,0.94);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 28px;
+  }
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand .mark{width:42px;height:42px;flex-shrink:0;}
+  .brand-text .name{font-family:'Fraunces',serif;font-weight:700;font-size:21px;color:var(--pine-deep);line-height:1.1;}
+  .brand-text .tag{font-size:11px;letter-spacing:0.09em;text-transform:uppercase;color:var(--clay);font-weight:600;}
+  .navlinks{display:flex;gap:2px;align-items:center;}
+  .navlinks button.navlink{
+    background:none;border:none;padding:10px 14px;font-size:14.5px;font-weight:500;
+    color:var(--ink-soft);border-radius:8px;transition:.15s;
+  }
+  .navlinks button.navlink:hover{background:var(--sand);color:var(--pine-deep);}
+  .navlinks button.navlink.active{color:var(--pine-deep);font-weight:700;background:var(--sand);}
+  .cta-btn{
+    background:var(--clay);color:#fff;border:none;padding:11px 20px;border-radius:9px;
+    font-weight:600;font-size:14px;letter-spacing:.01em;transition:.15s;box-shadow:var(--shadow);
+  }
+  .cta-btn:hover{background:var(--clay-dim);transform:translateY(-1px);}
+  .cta-btn.ghost{background:transparent;border:1.5px solid var(--pine);color:var(--pine-deep);box-shadow:none;}
+  .cta-btn.ghost:hover{background:var(--pine);color:#fff;}
+  .navToggle{display:none;background:none;border:none;padding:8px;}
+
+  main{max-width:1180px;margin:0 auto;padding:0 28px;}
+  .page{display:none;animation:fadeIn .35s ease;}
+  .page.visible{display:block;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+
+  /* ---------- hero ---------- */
+  .hero{
+    background:linear-gradient(160deg,var(--pine) 0%, var(--pine-deep) 100%);
+    color:#F3EEDD;border-radius:0 0 32px 32px;margin-top:-1px;
+    padding:64px 28px 56px;position:relative;overflow:hidden;
+  }
+  .hero::after{
+    content:"";position:absolute;right:-80px;top:-80px;width:360px;height:360px;border-radius:50%;
+    background:radial-gradient(circle,rgba(201,154,61,0.18),transparent 70%);
+  }
+  .hero-inner{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1.15fr 0.85fr;gap:40px;align-items:center;position:relative;}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--turmeric-soft);font-weight:600;margin-bottom:18px;}
+  .hero h1{font-size:44px;line-height:1.08;color:#fff;font-weight:700;}
+  .hero h1 em{font-style:italic;color:var(--turmeric-soft);}
+  .hero p.lead{font-size:16.5px;line-height:1.65;color:#D9D0BA;margin:20px 0 28px;max-width:520px;}
+  .hero-ctas{display:flex;gap:14px;flex-wrap:wrap;}
+  .hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:40px;max-width:520px;}
+  .hstat{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:14px 10px;text-align:center;}
+  .hstat .num{font-family:'Fraunces',serif;font-size:24px;font-weight:700;color:var(--turmeric-soft);}
+  .hstat .lbl{font-size:11.5px;color:#CFC7B2;margin-top:2px;}
+  .hero-visual{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:26px;}
+  .pulse-card{display:flex;align-items:center;gap:14px;padding:14px;background:rgba(255,255,255,0.07);border-radius:12px;margin-bottom:12px;}
+  .pulse-card .ico{width:38px;height:38px;flex-shrink:0;}
+  .pulse-card .t{font-weight:600;font-size:14.5px;color:#fff;}
+  .pulse-card .s{font-size:12.5px;color:#C7BEA6;}
+
+  section{margin:64px 0;}
+  .sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:28px;flex-wrap:wrap;}
+  .sec-eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--clay);font-weight:700;margin-bottom:8px;}
+  .sec-head h2{font-size:30px;}
+  .sec-head p{color:var(--ink-soft);max-width:480px;font-size:14.5px;line-height:1.55;}
+
+  /* ---------- cards ---------- */
+  .grid{display:grid;gap:20px;}
+  .grid.cols-4{grid-template-columns:repeat(4,1fr);}
+  .grid.cols-3{grid-template-columns:repeat(3,1fr);}
+  .grid.cols-2{grid-template-columns:repeat(2,1fr);}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:24px;transition:.18s;
+  }
+  .card:hover{box-shadow:var(--shadow);transform:translateY(-3px);border-color:transparent;}
+  .dept-card{cursor:pointer;}
+  .dept-card .ico-wrap{width:46px;height:46px;border-radius:11px;background:var(--sand);display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
+  .dept-card .ico-wrap svg{width:24px;height:24px;}
+  .dept-card h3{font-size:17px;margin-bottom:6px;}
+  .dept-card .local{font-size:12px;color:var(--clay);font-weight:600;margin-bottom:10px;display:block;}
+  .dept-card p{font-size:13.5px;color:var(--ink-soft);line-height:1.55;margin:0 0 14px;}
+  .dept-card .go{font-size:13px;font-weight:700;color:var(--pine-deep);display:inline-flex;align-items:center;gap:5px;}
+
+  /* ---------- about ---------- */
+  .about-wrap{display:grid;grid-template-columns:0.85fr 1.15fr;gap:44px;align-items:center;}
+  .about-portrait{
+    background:linear-gradient(160deg,var(--sand),#fff);border:1px solid var(--line);border-radius:20px;
+    padding:32px;text-align:center;
+  }
+  .avatar-ring{width:130px;height:130px;border-radius:50%;background:var(--pine);color:#fff;display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif;font-size:38px;font-weight:700;margin:0 auto 18px;border:5px solid var(--turmeric-soft);}
+  .about-portrait h3{font-size:20px;}
+  .about-portrait .role{color:var(--clay);font-weight:600;font-size:13.5px;margin:4px 0 14px;}
+  .cred-list{text-align:left;font-size:13px;color:var(--ink-soft);border-top:1px solid var(--line);padding-top:14px;margin-top:6px;line-height:1.9;}
+  .cred-list b{color:var(--ink);}
+  .about-copy p{font-size:15.5px;line-height:1.75;color:#3B372F;margin:0 0 16px;}
+  .pill-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;}
+  .pill{background:var(--sand);border-radius:100px;padding:7px 14px;font-size:12.5px;font-weight:600;color:var(--pine-deep);}
+
+  /* ---------- filters ---------- */
+  .filter-bar{
+    display:flex;gap:12px;flex-wrap:wrap;align-items:center;background:var(--card);
+    border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin-bottom:24px;
+  }
+  .filter-bar .fgroup{display:flex;flex-direction:column;gap:5px;}
+  .filter-bar label{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);font-weight:700;}
+  .filter-bar select,.filter-bar input{
+    border:1.5px solid var(--line);border-radius:8px;padding:9px 12px;font-size:13.5px;font-family:inherit;
+    background:#fff;color:var(--ink);min-width:150px;
+  }
+  .filter-bar input:focus,.filter-bar select:focus{border-color:var(--turmeric);}
+  .filter-bar .search-wrap{position:relative;flex:1;min-width:200px;}
+  .filter-bar .search-wrap svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:15px;height:15px;opacity:.5;}
+  .filter-bar .search-wrap input{padding-left:32px;width:100%;}
+  .filter-count{font-size:12.5px;color:var(--ink-soft);margin-left:auto;font-weight:600;}
+  .reset-btn{background:none;border:1.5px solid var(--line);border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600;color:var(--ink-soft);}
+  .reset-btn:hover{border-color:var(--clay);color:var(--clay);}
+
+  /* ---------- doctor cards ---------- */
+  .doc-card{display:flex;gap:14px;}
+  .doc-avatar{width:56px;height:56px;border-radius:50%;background:var(--pine);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;font-size:18px;flex-shrink:0;}
+  .doc-info h4{font-size:15.5px;margin-bottom:2px;}
+  .doc-info .spec{font-size:12.5px;color:var(--clay);font-weight:600;margin-bottom:6px;}
+  .doc-info .meta{font-size:12.5px;color:var(--ink-soft);line-height:1.6;}
+  .avail-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;margin-top:8px;color:var(--ok);}
+  .avail-dot{width:7px;height:7px;border-radius:50%;background:var(--ok);}
+
+  /* ---------- stats dashboard (records page) ---------- */
+  .bed-dash{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+  .bed-stat{background:var(--pine);color:#fff;border-radius:var(--radius);padding:20px;}
+  .bed-stat.alt{background:var(--card);color:var(--ink);border:1px solid var(--line);}
+  .bed-stat .num{font-family:'Fraunces',serif;font-size:30px;font-weight:700;}
+  .bed-stat.alt .num{color:var(--pine-deep);}
+  .bed-stat .lbl{font-size:12.5px;opacity:.85;margin-top:4px;}
+
+  table{width:100%;border-collapse:collapse;background:var(--card);border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);}
+  thead tr{background:var(--sand);}
+  th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--pine-deep);padding:12px 14px;font-weight:700;}
+  td{padding:13px 14px;font-size:13.5px;border-top:1px solid var(--line);color:#3B372F;}
+  tbody tr:hover{background:#FBF8F0;}
+  .status-chip{display:inline-block;padding:4px 10px;border-radius:100px;font-size:11px;font-weight:700;}
+  .status-Admitted{background:#FBEAE4;color:var(--warn);}
+  .status-OPD{background:#E7F2E9;color:var(--ok);}
+  .status-Discharged{background:#EDEAF0;color:#635B72;}
+  .table-wrap{overflow-x:auto;}
+
+  /* dept detail */
+  .dept-detail-head{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:32px;margin-bottom:32px;}
+  .dept-detail-head .ico-wrap{width:64px;height:64px;border-radius:16px;background:var(--sand);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .dept-detail-head .ico-wrap svg{width:32px;height:32px;}
+  .back-link{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:600;color:var(--clay);margin-bottom:18px;}
+  .treat-list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px;}
+  .treat-item{display:flex;gap:10px;align-items:center;background:var(--sand);padding:11px 14px;border-radius:9px;font-size:13.5px;font-weight:600;color:var(--pine-deep);}
+  .treat-item svg{width:15px;height:15px;flex-shrink:0;color:var(--clay);}
+
+  /* contact / appointment */
+  .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;}
+  .info-card{background:var(--pine);color:#F3EEDD;border-radius:20px;padding:32px;}
+  .info-row{display:flex;gap:14px;align-items:flex-start;margin-bottom:20px;}
+  .info-row svg{width:20px;height:20px;flex-shrink:0;color:var(--turmeric-soft);margin-top:2px;}
+  .info-row .t{font-weight:700;font-size:14.5px;}
+  .info-row .s{font-size:13.5px;color:#CFC7B2;}
+  .form-card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:32px;}
+  .form-row{margin-bottom:16px;}
+  .form-row label{display:block;font-size:12.5px;font-weight:700;color:var(--ink-soft);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;}
+  .form-row input,.form-row select,.form-row textarea{
+    width:100%;border:1.5px solid var(--line);border-radius:9px;padding:11px 13px;font-family:inherit;font-size:14px;background:#fff;
+  }
+  .form-row input:focus,.form-row select:focus,.form-row textarea:focus{border-color:var(--turmeric);}
+  .form-grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .submit-note{font-size:12.5px;color:var(--ink-soft);margin-top:10px;}
+  .success-box{display:none;background:#E7F2E9;border:1px solid #BFE0C6;color:var(--ok);border-radius:10px;padding:14px 16px;font-size:13.5px;font-weight:600;margin-top:14px;}
+
+  footer{margin-top:80px;background:var(--pine-deep);color:#C7BEA6;padding:48px 28px 26px;}
+  .footer-inner{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:32px;}
+  .footer-inner h4{color:#fff;font-size:14px;margin-bottom:14px;}
+  .footer-inner ul{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:9px;font-size:13px;}
+  .footer-inner ul li a:hover{color:#fff;}
+  .foot-bottom{max-width:1180px;margin:34px auto 0;padding-top:20px;border-top:1px solid rgba(255,255,255,0.1);font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+
+  @media(max-width:900px){
+    .hero-inner{grid-template-columns:1fr;}
+    .about-wrap{grid-template-columns:1fr;}
+    .grid.cols-4{grid-template-columns:repeat(2,1fr);}
+    .grid.cols-3{grid-template-columns:repeat(2,1fr);}
+    .grid.cols-2{grid-template-columns:1fr;}
+    .contact-grid{grid-template-columns:1fr;}
+    .footer-inner{grid-template-columns:1fr 1fr;}
+    .bed-dash{grid-template-columns:repeat(2,1fr);}
+    .navlinks{display:none;position:absolute;top:100%;left:0;right:0;background:var(--ivory);flex-direction:column;padding:10px;border-bottom:1px solid var(--line);}
+    .navlinks.open{display:flex;}
+    .navToggle{display:block;}
+    .treat-list{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="tel:9754287698">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+    +91 97542 87698
+  </a>
+  <div class="tb-right">
+    <span>100-Bed Multi-Speciality Ayurvedic Hospital</span>
+    <span>Open Mon – Sat, 9:00 AM – 8:00 PM</span>
+  </div>
+</div>
+
+<nav class="mainnav">
+  <div class="brand">
+    <svg class="mark" viewBox="0 0 48 48" fill="none">
+      <circle cx="24" cy="24" r="23" fill="#16302A"/>
+      <path d="M24 34c-6-4.5-10-8.7-10-13.6C14 16.9 17 14 20.4 14c1.7 0 3.2.8 3.6 2 .4-1.2 1.9-2 3.6-2C31 14 34 16.9 34 20.4 34 25.3 30 29.5 24 34z" fill="#C99A3D"/>
+      <path d="M9 25h5l2.5-6L20 30l2.5-11 2 6h14.5" stroke="#FBF7EF" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div class="brand-text">
+      <div class="name">Lifeline Hospital</div>
+      <div class="tag">Pure Ayurvedic Care</div>
+    </div>
+  </div>
+  <button class="navToggle" id="navToggle" aria-label="Menu">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16302A" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+  </button>
+  <div class="navlinks" id="navLinks">
+    <button class="navlink" data-nav="home">Home</button>
+    <button class="navlink" data-nav="about">About</button>
+    <button class="navlink" data-nav="departments">Departments</button>
+    <button class="navlink" data-nav="doctors">Doctors</button>
+    <button class="navlink" data-nav="records">Patient Records</button>
+    <button class="navlink" data-nav="contact">Contact</button>
+  </div>
+  <button class="cta-btn" data-nav="contact">Book Appointment</button>
+</nav>
+
+<main>
+
+  <!-- ================= HOME ================= -->
+  <section class="page" id="page-home">
+    <div class="hero">
+      <div class="hero-inner">
+        <div>
+          <div class="eyebrow">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+            100% Ayurvedic &middot; Ratlam, Madhya Pradesh
+          </div>
+          <h1>Healing rooted in tradition,<br><em>guided by modern care.</em></h1>
+          <p class="lead">Lifeline Hospital is a 100-bed Ayurvedic-only hospital led by Dr. Namita Pawar, offering Panchakarma, herbal medicine and lifestyle therapies across eight dedicated departments — with no allopathic shortcuts.</p>
+          <div class="hero-ctas">
+            <button class="cta-btn" data-nav="contact">Book an Appointment</button>
+            <button class="cta-btn ghost" data-nav="departments">Explore Departments</button>
+          </div>
+          <div class="hero-stats">
+            <div class="hstat"><div class="num">100</div><div class="lbl">Bed Capacity</div></div>
+            <div class="hstat"><div class="num">8</div><div class="lbl">Departments</div></div>
+            <div class="hstat"><div class="num">3+ yrs</div><div class="lbl">Clinical Practice</div></div>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="pulse-card">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#C99A3D" stroke-width="1.8"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg>
+            <div><div class="t">Panchakarma Detox</div><div class="s">Classical five-fold cleansing therapy</div></div>
+          </div>
+          <div class="pulse-card">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#C99A3D" stroke-width="1.8"><path d="M12 21s-7-4.6-9.5-9C.7 8 2 4 6 4c2 0 3.5 1.3 4 2.4C10.5 5.3 12 4 14 4c4 0 5.3 4 3.5 8-2.5 4.4-9.5 9-9.5 9z"/></svg>
+            <div><div class="t">100-Bed In-Patient Care</div><div class="s">Round-the-clock Ayurvedic nursing</div></div>
+          </div>
+          <div class="pulse-card">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#C99A3D" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+            <div><div class="t">Dr. Namita Pawar</div><div class="s">Chief Ayurvedic Physician, BAMS</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pulse-divider">
+      <svg viewBox="0 0 220 34"><polyline points="0,17 40,17 52,4 64,30 76,17 90,17 98,8 106,26 114,17 220,17" fill="none" stroke="#A13D2C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <section>
+      <div class="sec-head">
+        <div>
+          <div class="sec-eyebrow">Why Lifeline</div>
+          <h2>Modern facilities. Classical treatment.</h2>
+        </div>
+        <p>Every therapy at Lifeline follows classical Ayurvedic texts, delivered through a modern, hygienic, and fully-tracked hospital system.</p>
+      </div>
+      <div class="grid cols-4">
+        <div class="card">
+          <div class="dept-card"><div class="ico-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="#A13D2C" stroke-width="2"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg></div>
+          <h3>Advanced Doctor Search</h3><p>Filter physicians instantly by department, experience and availability.</p></div>
+        </div>
+        <div class="card">
+          <div class="dept-card"><div class="ico-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="#A13D2C" stroke-width="2"><rect x="3" y="11" width="18" height="8" rx="2"/><path d="M5 11V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3M8 19v2M16 19v2"/></svg></div>
+          <h3>Live Bed & Patient Records</h3><p>Real-time 100-bed occupancy dashboard with searchable patient database.</p></div>
+        </div>
+        <div class="card">
+          <div class="dept-card"><div class="ico-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="#A13D2C" stroke-width="2"><path d="M12 21s-7-4.6-9.5-9C.7 8 2 4 6 4c2 0 3.5 1.3 4 2.4C10.5 5.3 12 4 14 4c4 0 5.3 4 3.5 8-2.5 4.4-9.5 9-9.5 9z"/></svg></div>
+          <h3>8 Dedicated Departments</h3><p>Each department has its own page, treatments list and assigned doctors.</p></div>
+        </div>
+        <div class="card">
+          <div class="dept-card"><div class="ico-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="#A13D2C" stroke-width="2"><path d="M4 4v16M4 8h12l-2-4 2-4H4"/></svg></div>
+          <h3>Online Appointment Booking</h3><p>Book a consultation for any department directly from the website.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-head">
+        <div><div class="sec-eyebrow">Departments</div><h2>Eight paths to healing</h2></div>
+        <button class="cta-btn ghost" data-nav="departments">View all departments</button>
+      </div>
+      <div class="grid cols-4" id="home-dept-preview"></div>
+    </section>
+  </section>
+
+  <!-- ================= ABOUT ================= -->
+  <section class="page" id="page-about">
+    <div style="margin:48px 0 12px;">
+      <div class="sec-eyebrow">About Lifeline</div>
+      <h2 style="font-size:32px;">Founded on one principle — Ayurveda, done properly.</h2>
+    </div>
+    <section class="about-wrap">
+      <div class="about-portrait">
+        <div class="avatar-ring">NP</div>
+        <h3>Dr. Namita Pawar</h3>
+        <div class="role">Founder &amp; Chief Ayurvedic Physician</div>
+        <div class="cred-list">
+          <div><b>Qualification:</b> BAMS</div>
+          <div><b>College:</b> Shiv Shakti Lala College, Ratlam (M.P.)</div>
+          <div><b>Experience:</b> 3+ Years in Clinical Ayurveda</div>
+          <div><b>Focus:</b> Panchakarma &amp; Kayachikitsa</div>
+        </div>
+      </div>
+      <div class="about-copy">
+        <p>Lifeline Hospital was founded by <b>Dr. Namita Pawar</b>, a graduate of Shiv Shakti Lala College, Ratlam (M.P.), with the belief that Ayurveda deserves the same rigor, hygiene and infrastructure people expect from a modern hospital — without ever introducing allopathic treatment.</p>
+        <p>Today, Lifeline runs as a <b>100-bed, Ayurveda-only hospital</b> with eight dedicated departments covering everything from Panchakarma detoxification to women's health and stress-related disorders. Every patient is treated using classical diagnosis (Nadi Pariksha, Prakriti assessment) followed by personalised herbal, dietary and therapy-based treatment plans.</p>
+        <p>Our in-house pharmacy prepares therapy-grade oils, kashayams and churnas on site, and every admission is tracked through our internal patient-record system so that families and referring doctors always know a patient's status.</p>
+        <div class="pill-row">
+          <span class="pill">Nadi Pariksha Diagnosis</span>
+          <span class="pill">In-house Herbal Pharmacy</span>
+          <span class="pill">100-Bed In-Patient Wing</span>
+          <span class="pill">Zero Allopathic Mixing</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="pulse-divider">
+      <svg viewBox="0 0 220 34"><polyline points="0,17 40,17 52,4 64,30 76,17 90,17 98,8 106,26 114,17 220,17" fill="none" stroke="#A13D2C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <section>
+      <div class="sec-head"><div><div class="sec-eyebrow">Our Promise</div><h2>What every patient can expect</h2></div></div>
+      <div class="grid cols-3">
+        <div class="card"><h3 style="font-size:16px;margin-bottom:8px;">Classical Diagnosis</h3><p style="font-size:13.5px;color:var(--ink-soft);line-height:1.6;">Every treatment plan begins with Nadi Pariksha and Prakriti (body constitution) assessment — never a generic prescription.</p></div>
+        <div class="card"><h3 style="font-size:16px;margin-bottom:8px;">Hygienic, Modern Wards</h3><p style="font-size:13.5px;color:var(--ink-soft);line-height:1.6;">100 in-patient beds across general, semi-private and private wards, cleaned and monitored to hospital-grade standards.</p></div>
+        <div class="card"><h3 style="font-size:16px;margin-bottom:8px;">Tracked Recovery</h3><p style="font-size:13.5px;color:var(--ink-soft);line-height:1.6;">Digital patient records let our physicians and your family track therapy progress at every stage of admission.</p></div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ================= DEPARTMENTS LIST ================= -->
+  <section class="page" id="page-departments">
+    <div style="margin:48px 0 28px;">
+      <div class="sec-eyebrow">Departments</div>
+      <h2 style="font-size:32px;">Eight departments, one Ayurvedic system.</h2>
+      <p style="color:var(--ink-soft);max-width:560px;margin-top:10px;font-size:14.5px;">Select a department to see its treatments and assigned physicians.</p>
+    </div>
+    <div class="grid cols-4" id="dept-list"></div>
+  </section>
+
+  <!-- ================= DEPARTMENT DETAIL ================= -->
+  <section class="page" id="page-dept-detail">
+    <div style="margin-top:40px;">
+      <button class="back-link" data-nav="departments">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>
+        Back to Departments
+      </button>
+      <div class="dept-detail-head" id="dept-detail-head"></div>
+      <div class="sec-head"><div><h2 style="font-size:22px;">Key Treatments</h2></div></div>
+      <div class="treat-list" id="dept-treat-list"></div>
+      <div class="sec-head" style="margin-top:44px;"><div><h2 style="font-size:22px;">Physicians in this Department</h2></div></div>
+      <div class="grid cols-3" id="dept-doc-list"></div>
+    </div>
+  </section>
+
+  <!-- ================= DOCTORS ================= -->
+  <section class="page" id="page-doctors">
+    <div style="margin:48px 0 24px;">
+      <div class="sec-eyebrow">Our Physicians</div>
+      <h2 style="font-size:32px;">Find the right doctor, fast.</h2>
+    </div>
+    <div class="filter-bar">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" id="doc-search" placeholder="Search doctor by name...">
+      </div>
+      <div class="fgroup">
+        <label>Department</label>
+        <select id="doc-filter-dept"><option value="all">All Departments</option></select>
+      </div>
+      <div class="fgroup">
+        <label>Availability</label>
+        <select id="doc-filter-avail">
+          <option value="all">Any</option>
+          <option value="yes">Available Today</option>
+        </select>
+      </div>
+      <div class="fgroup">
+        <label>Sort by</label>
+        <select id="doc-sort">
+          <option value="name">Name (A–Z)</option>
+          <option value="exp">Experience (High–Low)</option>
+        </select>
+      </div>
+      <button class="reset-btn" id="doc-reset">Reset</button>
+      <div class="filter-count" id="doc-count"></div>
+    </div>
+    <div class="grid cols-3" id="doctor-list"></div>
+  </section>
+
+  <!-- ================= PATIENT RECORDS ================= -->
+  <section class="page" id="page-records">
+    <div style="margin:48px 0 24px;">
+      <div class="sec-eyebrow">Hospital Records</div>
+      <h2 style="font-size:32px;">100-Bed Occupancy &amp; Patient Database</h2>
+      <p style="color:var(--ink-soft);max-width:600px;margin-top:10px;font-size:14.5px;">Live sample view of Lifeline's internal patient-tracking system. Connect this page to your hospital's real database to go live.</p>
+    </div>
+
+    <div class="bed-dash" id="bed-dash"></div>
+
+    <div class="filter-bar">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" id="pat-search" placeholder="Search by patient name or ID...">
+      </div>
+      <div class="fgroup">
+        <label>Department</label>
+        <select id="pat-filter-dept"><option value="all">All Departments</option></select>
+      </div>
+      <div class="fgroup">
+        <label>Status</label>
+        <select id="pat-filter-status">
+          <option value="all">All</option>
+          <option value="Admitted">Admitted</option>
+          <option value="OPD">OPD</option>
+          <option value="Discharged">Discharged</option>
+        </select>
+      </div>
+      <button class="reset-btn" id="pat-reset">Reset</button>
+      <div class="filter-count" id="pat-count"></div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Patient ID</th><th>Name</th><th>Age / Gender</th><th>Department</th>
+          <th>Attending Doctor</th><th>Bed No.</th><th>Admitted On</th><th>Status</th>
+        </tr></thead>
+        <tbody id="records-tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="sec-head" style="margin-top:44px;">
+      <div><div class="sec-eyebrow">Add Record</div><h2 style="font-size:20px;">Add a new patient (demo)</h2></div>
+    </div>
+    <div class="card" style="padding:28px;">
+      <div class="form-grid2">
+        <div class="form-row"><label>Patient Name</label><input id="np-name" type="text" placeholder="Full name"></div>
+        <div class="form-row"><label>Age / Gender</label><input id="np-age" type="text" placeholder="e.g. 34 / F"></div>
+        <div class="form-row"><label>Department</label><select id="np-dept"></select></div>
+        <div class="form-row"><label>Bed No.</label><input id="np-bed" type="text" placeholder="e.g. B-42"></div>
+        <div class="form-row"><label>Status</label>
+          <select id="np-status"><option>Admitted</option><option>OPD</option><option>Discharged</option></select>
+        </div>
+        <div class="form-row"><label>Attending Doctor</label><select id="np-doc"></select></div>
+      </div>
+      <button class="cta-btn" id="np-submit">Add Patient Record</button>
+      <p class="submit-note">Demo only — new records are stored in this browser session and reset on page reload.</p>
+    </div>
+  </section>
+
+  <!-- ================= CONTACT ================= -->
+  <section class="page" id="page-contact">
+    <div style="margin:48px 0 24px;">
+      <div class="sec-eyebrow">Contact &amp; Appointment</div>
+      <h2 style="font-size:32px;">Book your Ayurvedic consultation</h2>
+    </div>
+    <div class="contact-grid">
+      <div class="info-card">
+        <div class="info-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <div><div class="t">Call Us</div><div class="s">+91 97542 87698</div></div>
+        </div>
+        <div class="info-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+          <div><div class="t">Email</div><div class="s">care@lifelinehospital.in</div></div>
+        </div>
+        <div class="info-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <div><div class="t">Location</div><div class="s">Lifeline Hospital, Ratlam, Madhya Pradesh</div></div>
+        </div>
+        <div class="info-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <div><div class="t">Hours</div><div class="s">Mon – Sat, 9:00 AM – 8:00 PM &nbsp;|&nbsp; IPD: 24x7</div></div>
+        </div>
+        <div class="pulse-divider" style="justify-content:flex-start;margin-top:24px;">
+          <svg viewBox="0 0 220 34" style="width:180px;"><polyline points="0,17 40,17 52,4 64,30 76,17 90,17 98,8 106,26 114,17 220,17" fill="none" stroke="#C99A3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div class="form-card">
+        <div class="form-row"><label>Full Name</label><input type="text" id="ap-name" placeholder="Your name"></div>
+        <div class="form-grid2">
+          <div class="form-row"><label>Phone Number</label><input type="tel" id="ap-phone" placeholder="10-digit mobile number"></div>
+          <div class="form-row"><label>Preferred Date</label><input type="date" id="ap-date"></div>
+        </div>
+        <div class="form-row"><label>Department</label><select id="ap-dept"></select></div>
+        <div class="form-row"><label>Message (optional)</label><textarea rows="3" id="ap-msg" placeholder="Tell us briefly about your concern"></textarea></div>
+        <button class="cta-btn" id="ap-submit" style="width:100%;">Request Appointment</button>
+        <div class="success-box" id="ap-success">Thank you — your appointment request has been noted. Our team will call you shortly at the number provided.</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="name" style="color:#fff;font-family:'Fraunces',serif;font-weight:700;font-size:19px;">Lifeline Hospital</div>
+      <p style="font-size:13px;line-height:1.7;margin-top:10px;max-width:280px;">A 100-bed, Ayurveda-only hospital in Ratlam, Madhya Pradesh, founded by Dr. Namita Pawar (BAMS, Shiv Shakti Lala College, Ratlam).</p>
+    </div>
+    <div>
+      <h4>Explore</h4>
+      <ul>
+        <li><a href="#" data-nav="about">About Us</a></li>
+        <li><a href="#" data-nav="departments">Departments</a></li>
+        <li><a href="#" data-nav="doctors">Our Doctors</a></li>
+        <li><a href="#" data-nav="records">Patient Records</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Departments</h4>
+      <ul id="footer-dept-list"></ul>
+    </div>
+    <div>
+      <h4>Contact</h4>
+      <ul>
+        <li>+91 97542 87698</li>
+        <li>care@lifelinehospital.in</li>
+        <li>Ratlam, Madhya Pradesh</li>
+        <li>Mon–Sat, 9 AM–8 PM</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span>© 2026 Lifeline Hospital. Pure Ayurvedic Care.</span>
+    <span>Design demo — connect a backend for live data.</span>
+  </div>
+</footer>
+
+<script>
+/* ============ ICON LIBRARY (per department) ============ */
+function icon(name, color){
+  color = color || "#A13D2C";
+  const icons = {
+    panchakarma: `<path d="M3 12h4l2-7 4 14 2-7h6"/>`,
+    kayachikitsa: `<path d="M12 21s-7-4.6-9.5-9C.7 8 2 4 6 4c2 0 3.5 1.3 4 2.4C10.5 5.3 12 4 14 4c4 0 5.3 4 3.5 8-2.5 4.4-9.5 9-9.5 9z"/>`,
+    orthopedics: `<circle cx="6.5" cy="6.5" r="3"/><circle cx="17.5" cy="17.5" r="3"/><path d="M8.7 8.7l6.6 6.6"/>`,
+    skin: `<circle cx="12" cy="12" r="9"/><path d="M8 12c1-2 3-2 4 0s3 2 4 0"/>`,
+    women: `<circle cx="12" cy="8" r="4"/><path d="M12 12v9M9 18h6"/>`,
+    digestive: `<path d="M9 3c0 3-3 4-3 8a6 6 0 0 0 12 0c0-4-3-5-3-8"/>`,
+    yoga: `<circle cx="12" cy="5" r="2"/><path d="M12 7v6l-5 6M12 13l5 6M7 11h10"/>`,
+    lifestyle: `<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>`,
+    search: `<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>`,
+    check: `<path d="M20 6 9 17l-5-5"/>`
+  };
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icons[name]||icons.check}</svg>`;
+}
+
+/* ============ DATA ============ */
+const departments = [
+  {id:"panchakarma", name:"Panchakarma Therapy", local:"शोधन चिकित्सा", icon:"panchakarma",
+    desc:"Classical five-fold detoxification therapy that removes deep-seated toxins (Ama) and resets the body's doshas.",
+    treatments:["Vamana (Emesis Therapy)","Virechana (Purgation Therapy)","Basti (Medicated Enema)","Nasya (Nasal Therapy)","Raktamokshana (Bloodletting)","Abhyanga & Shirodhara"]},
+  {id:"kayachikitsa", name:"Kayachikitsa", local:"सामान्य आयुर्वेद चिकित्सा", icon:"kayachikitsa",
+    desc:"General internal Ayurvedic medicine for chronic illness, immunity building and long-term wellness management.",
+    treatments:["Chronic Disease Management","Immunity Building (Rasayana)","Herbal Medicine Plans","Seasonal Detox Programs","Diabetes & Thyroid Care","Joint & Muscle Disorders"]},
+  {id:"orthopedics", name:"Asthi-Sandhi Chikitsa", local:"अस्थि संधि चिकित्सा", icon:"orthopedics",
+    desc:"Ayurvedic orthopedic care for bones, joints and the spine using therapeutic oils, Basti and physiotherapy-style movement.",
+    treatments:["Arthritis & Joint Pain","Spine & Disc Care","Sports Injury Recovery","Frozen Shoulder Therapy","Janu Basti (Knee Therapy)","Kati Basti (Lower Back)"]},
+  {id:"skin", name:"Twak Chikitsa", local:"त्वचा एवं केश चिकित्सा", icon:"skin",
+    desc:"Skin and hair care rooted in Ayurvedic dermatology — treating the root cause rather than masking symptoms.",
+    treatments:["Psoriasis & Eczema Care","Acne & Pigmentation","Hair Fall & Dandruff Therapy","Premature Greying","Herbal Skin Detox","Lepa & Herbal Pack Therapy"]},
+  {id:"women", name:"Prasuti Tantra", local:"स्त्री एवं प्रसूति रोग", icon:"women",
+    desc:"Women's health across every life stage — menstrual health, fertility support, pregnancy and postnatal recovery.",
+    treatments:["PCOD / PCOS Management","Menstrual Disorders","Prenatal Ayurvedic Care","Postnatal Recovery (Sutika)","Fertility Support","Uttar Basti Therapy"]},
+  {id:"digestive", name:"Agni Chikitsa", local:"पाचन तंत्र चिकित्सा", icon:"digestive",
+    desc:"Digestive and gut health treatment focused on restoring Agni (digestive fire) — the root of most chronic illness.",
+    treatments:["IBS & Bloating Relief","Acidity & Gastritis Care","Chronic Constipation","Liver Detox Programs","Piles (Arsha) Treatment","Diet & Agni Correction Plans"]},
+  {id:"yoga", name:"Yoga & Naturopathy", local:"योग एवं प्राकृतिक चिकित्सा", icon:"yoga",
+    desc:"Therapeutic yoga, meditation and naturopathy programs that complement clinical Ayurvedic treatment.",
+    treatments:["Therapeutic Yoga Sessions","Guided Meditation","Personalised Diet Counselling","Mud & Hydrotherapy","Breathing (Pranayama) Therapy","Lifestyle Correction Plans"]},
+  {id:"lifestyle", name:"Manas Roga", local:"तनाव एवं जीवनशैली रोग", icon:"lifestyle",
+    desc:"Stress, sleep and lifestyle-disorder care addressing anxiety, insomnia, diabetes and weight through Ayurveda.",
+    treatments:["Stress & Anxiety Management","Insomnia Therapy","Diabetes & Obesity Care","Shirodhara for Mental Calm","Nasya for Mental Clarity","Daily Routine (Dinacharya) Planning"]},
+];
+
+const doctors = [
+  {id:1, name:"Dr. Namita Pawar", dept:"panchakarma", title:"Founder & Chief Ayurvedic Physician", qual:"BAMS, Shiv Shakti Lala College, Ratlam (M.P.)", exp:3, avail:true, days:"Mon–Sat, 9 AM–6 PM"},
+  {id:2, name:"Dr. Aakash Verma", dept:"kayachikitsa", title:"Senior Consultant – Kayachikitsa", qual:"BAMS, MD (Ayurveda)", exp:6, avail:true, days:"Mon–Sat, 10 AM–5 PM"},
+  {id:3, name:"Dr. Priya Rathore", dept:"orthopedics", title:"Consultant – Asthi-Sandhi Chikitsa", qual:"BAMS, PG Panchakarma", exp:4, avail:false, days:"Tue, Thu, Sat"},
+  {id:4, name:"Dr. Sanjay Chouhan", dept:"skin", title:"Consultant – Twak Chikitsa", qual:"BAMS, MD (Skin & Panchakarma)", exp:5, avail:true, days:"Mon–Fri, 11 AM–7 PM"},
+  {id:5, name:"Dr. Kavita Solanki", dept:"women", title:"Consultant – Prasuti Tantra", qual:"BAMS, MS (Ayurveda)", exp:7, avail:true, days:"Mon–Sat, 9 AM–4 PM"},
+  {id:6, name:"Dr. Rohit Mahajan", dept:"digestive", title:"Consultant – Agni Chikitsa", qual:"BAMS, PG Panchakarma", exp:4, avail:false, days:"Mon, Wed, Fri"},
+  {id:7, name:"Dr. Sneha Joshi", dept:"yoga", title:"Yoga & Naturopathy Therapist", qual:"BNYS", exp:3, avail:true, days:"Daily, 6 AM–11 AM"},
+  {id:8, name:"Dr. Manish Bhargava", dept:"lifestyle", title:"Consultant – Manas Roga", qual:"BAMS, MD (Ayurveda)", exp:8, avail:true, days:"Mon–Sat, 10 AM–6 PM"},
+];
+
+let patients = [
+  {id:"LH-1042", name:"Ramesh Chandel", age:"52 / M", dept:"orthopedics", doc:3, bed:"B-14", date:"2026-07-02", status:"Admitted"},
+  {id:"LH-1043", name:"Sunita Devi", age:"38 / F", dept:"women", doc:5, bed:"B-27", date:"2026-07-05", status:"Admitted"},
+  {id:"LH-1044", name:"Arvind Patidar", age:"45 / M", dept:"digestive", doc:6, bed:"—", date:"2026-07-08", status:"OPD"},
+  {id:"LH-1045", name:"Meena Sharma", age:"60 / F", dept:"panchakarma", doc:1, bed:"B-03", date:"2026-06-28", status:"Admitted"},
+  {id:"LH-1046", name:"Vikas Rathore", age:"29 / M", dept:"skin", doc:4, bed:"—", date:"2026-07-01", status:"Discharged"},
+  {id:"LH-1047", name:"Pooja Yadav", age:"33 / F", dept:"lifestyle", doc:8, bed:"B-51", date:"2026-07-09", status:"Admitted"},
+  {id:"LH-1048", name:"Deepak Joshi", age:"41 / M", dept:"kayachikitsa", doc:2, bed:"B-19", date:"2026-07-10", status:"Admitted"},
+  {id:"LH-1049", name:"Anita Malviya", age:"55 / F", dept:"orthopedics", doc:3, bed:"—", date:"2026-06-30", status:"Discharged"},
+  {id:"LH-1050", name:"Suresh Nagar", age:"48 / M", dept:"panchakarma", doc:1, bed:"B-08", date:"2026-07-11", status:"Admitted"},
+  {id:"LH-1051", name:"Radha Baghel", age:"27 / F", dept:"yoga", doc:7, bed:"—", date:"2026-07-12", status:"OPD"},
+];
+let patientCounter = 1052;
+const TOTAL_BEDS = 100;
+
+function deptName(id){ const d = departments.find(x=>x.id===id); return d ? d.name : id; }
+function docName(id){ const d = doctors.find(x=>x.id===id); return d ? d.name : "—"; }
+function initials(name){ return name.replace("Dr. ","").split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase(); }
+
+/* ============ ROUTING ============ */
+const pages = document.querySelectorAll(".page");
+function showPage(id){
+  pages.forEach(p=>p.classList.remove("visible"));
+  const target = document.getElementById("page-"+id) || document.getElementById("page-home");
+  target.classList.add("visible");
+  document.querySelectorAll(".navlink").forEach(b=>{
+    b.classList.toggle("active", b.dataset.nav===id.split("-")[0] || (id==="departments" && b.dataset.nav==="departments"));
+  });
+  window.scrollTo({top:0, behavior:"instant"});
+  document.getElementById("navLinks").classList.remove("open");
+}
+function navigateHash(){
+  const hash = location.hash.replace("#","") || "home";
+  if(hash.startsWith("dept/")){
+    const deptId = hash.split("/")[1];
+    renderDeptDetail(deptId);
+    showPage("dept-detail");
+  } else {
+    showPage(hash);
+  }
+}
+document.querySelectorAll("[data-nav]").forEach(el=>{
+  el.addEventListener("click", (e)=>{
+    e.preventDefault();
+    location.hash = el.dataset.nav;
+  });
+});
+window.addEventListener("hashchange", navigateHash);
+document.getElementById("navToggle").addEventListener("click", ()=>{
+  document.getElementById("navLinks").classList.toggle("open");
+});
+
+/* ============ RENDER: department cards ============ */
+function deptCardHTML(d){
+  return `<div class="card dept-card" data-goto="dept/${d.id}">
+    <div class="ico-wrap">${icon(d.icon)}</div>
+    <span class="local">${d.local}</span>
+    <h3>${d.name}</h3>
+    <p>${d.desc}</p>
+    <span class="go">View Department →</span>
+  </div>`;
+}
+document.getElementById("dept-list").innerHTML = departments.map(deptCardHTML).join("");
+document.getElementById("home-dept-preview").innerHTML = departments.slice(0,4).map(deptCardHTML).join("");
+document.getElementById("footer-dept-list").innerHTML = departments.slice(0,5).map(d=>`<li><a href="#" data-goto="dept/${d.id}">${d.name}</a></li>`).join("");
+
+document.addEventListener("click",(e)=>{
+  const el = e.target.closest("[data-goto]");
+  if(el){ location.hash = el.dataset.goto; }
+});
+
+/* ============ RENDER: department detail ============ */
+function renderDeptDetail(deptId){
+  const d = departments.find(x=>x.id===deptId) || departments[0];
+  document.getElementById("dept-detail-head").innerHTML = `
+    <div class="ico-wrap">${icon(d.icon)}</div>
+    <div>
+      <span class="local">${d.local}</span>
+      <h2 style="font-size:26px;margin:4px 0 10px;">${d.name}</h2>
+      <p style="color:var(--ink-soft);font-size:14.5px;line-height:1.6;max-width:640px;">${d.desc}</p>
+    </div>`;
+  document.getElementById("dept-treat-list").innerHTML = d.treatments.map(t=>
+    `<div class="treat-item">${icon("check")}${t}</div>`).join("");
+  const docs = doctors.filter(doc=>doc.dept===deptId);
+  document.getElementById("dept-doc-list").innerHTML = docs.length ? docs.map(doctorCardHTML).join("") :
+    `<p style="color:var(--ink-soft);font-size:14px;">Doctor assignment for this department is being updated.</p>`;
+}
+
+/* ============ RENDER: doctors + filters ============ */
+function doctorCardHTML(doc){
+  return `<div class="card doc-card">
+    <div class="doc-avatar">${initials(doc.name)}</div>
+    <div class="doc-info">
+      <h4>${doc.name}</h4>
+      <div class="spec">${doc.title}</div>
+      <div class="meta">${doc.qual}<br>${doc.exp} yrs experience &middot; ${deptName(doc.dept)}</div>
+      <div class="avail-badge" style="color:${doc.avail? '#3E7A4F':'#B4522C'}">
+        <span class="avail-dot" style="background:${doc.avail? '#3E7A4F':'#B4522C'}"></span>
+        ${doc.avail? "Available Today" : "Next available on scheduled day"}
+      </div>
+      <div style="font-size:11.5px;color:var(--ink-soft);margin-top:4px;">${doc.days}</div>
+    </div>
+  </div>`;
+}
+const deptSelectOptions = departments.map(d=>`<option value="${d.id}">${d.name}</option>`).join("");
+document.getElementById("doc-filter-dept").insertAdjacentHTML("beforeend", deptSelectOptions);
+
+function renderDoctors(){
+  const q = document.getElementById("doc-search").value.trim().toLowerCase();
+  const dept = document.getElementById("doc-filter-dept").value;
+  const avail = document.getElementById("doc-filter-avail").value;
+  const sort = document.getElementById("doc-sort").value;
+  let list = doctors.filter(d=>{
+    if(q && !d.name.toLowerCase().includes(q)) return false;
+    if(dept!=="all" && d.dept!==dept) return false;
+    if(avail==="yes" && !d.avail) return false;
+    return true;
+  });
+  if(sort==="name") list.sort((a,b)=>a.name.localeCompare(b.name));
+  if(sort==="exp") list.sort((a,b)=>b.exp-a.exp);
+  document.getElementById("doctor-list").innerHTML = list.length ? list.map(doctorCardHTML).join("") :
+    `<p style="color:var(--ink-soft);">No doctors match your filters.</p>`;
+  document.getElementById("doc-count").textContent = list.length + " doctor" + (list.length!==1?"s":"") + " found";
+}
+["doc-search","doc-filter-dept","doc-filter-avail","doc-sort"].forEach(id=>{
+  document.getElementById(id).addEventListener("input", renderDoctors);
+  document.getElementById(id).addEventListener("change", renderDoctors);
+});
+document.getElementById("doc-reset").addEventListener("click", ()=>{
+  document.getElementById("doc-search").value="";
+  document.getElementById("doc-filter-dept").value="all";
+  document.getElementById("doc-filter-avail").value="all";
+  document.getElementById("doc-sort").value="name";
+  renderDoctors();
+});
+
+/* ============ RENDER: bed dashboard + records ============ */
+function renderBedDash(){
+  const admitted = patients.filter(p=>p.status==="Admitted").length;
+  const opd = patients.filter(p=>p.status==="OPD").length;
+  const available = TOTAL_BEDS - admitted;
+  document.getElementById("bed-dash").innerHTML = `
+    <div class="bed-stat"><div class="num">${TOTAL_BEDS}</div><div class="lbl">Total Beds</div></div>
+    <div class="bed-stat alt"><div class="num">${admitted}</div><div class="lbl">Currently Admitted</div></div>
+    <div class="bed-stat alt"><div class="num">${available}</div><div class="lbl">Beds Available</div></div>
+    <div class="bed-stat alt"><div class="num">${opd}</div><div class="lbl">OPD Today</div></div>`;
+}
+
+function patientRow(p){
+  return `<tr>
+    <td>${p.id}</td><td>${p.name}</td><td>${p.age}</td><td>${deptName(p.dept)}</td>
+    <td>${docName(p.doc)}</td><td>${p.bed}</td><td>${p.date}</td>
+    <td><span class="status-chip status-${p.status}">${p.status}</span></td>
+  </tr>`;
+}
+document.getElementById("pat-filter-dept").insertAdjacentHTML("beforeend", deptSelectOptions);
+
+function renderPatients(){
+  const q = document.getElementById("pat-search").value.trim().toLowerCase();
+  const dept = document.getElementById("pat-filter-dept").value;
+  const status = document.getElementById("pat-filter-status").value;
+  let list = patients.filter(p=>{
+    if(q && !(p.name.toLowerCase().includes(q) || p.id.toLowerCase().includes(q))) return false;
+    if(dept!=="all" && p.dept!==dept) return false;
+    if(status!=="all" && p.status!==status) return false;
+    return true;
+  });
+  document.getElementById("records-tbody").innerHTML = list.length ? list.map(patientRow).join("") :
+    `<tr><td colspan="8" style="text-align:center;color:var(--ink-soft);padding:24px;">No records match your filters.</td></tr>`;
+  document.getElementById("pat-count").textContent = list.length + " record" + (list.length!==1?"s":"") + " found";
+  renderBedDash();
+}
+["pat-search","pat-filter-dept","pat-filter-status"].forEach(id=>{
+  document.getElementById(id).addEventListener("input", renderPatients);
+  document.getElementById(id).addEventListener("change", renderPatients);
+});
+document.getElementById("pat-reset").addEventListener("click", ()=>{
+  document.getElementById("pat-search").value="";
+  document.getElementById("pat-filter-dept").value="all";
+  document.getElementById("pat-filter-status").value="all";
+  renderPatients();
+});
+
+/* ============ Add patient form ============ */
+document.getElementById("np-dept").insertAdjacentHTML("beforeend", deptSelectOptions);
+function refreshDocSelect(){
+  const dept = document.getElementById("np-dept").value;
+  const opts = doctors.filter(d=>d.dept===dept).map(d=>`<option value="${d.id}">${d.name}</option>`).join("");
+  document.getElementById("np-doc").innerHTML = opts || `<option value="">No doctor assigned</option>`;
+}
+document.getElementById("np-dept").addEventListener("change", refreshDocSelect);
+refreshDocSelect();
+
+document.getElementById("np-submit").addEventListener("click", ()=>{
+  const name = document.getElementById("np-name").value.trim();
+  const age = document.getElementById("np-age").value.trim();
+  const dept = document.getElementById("np-dept").value;
+  const bed = document.getElementById("np-bed").value.trim() || "—";
+  const status = document.getElementById("np-status").value;
+  const doc = parseInt(document.getElementById("np-doc").value) || null;
+  if(!name || !age){ alert("Please enter patient name and age/gender."); return; }
+  patients.unshift({
+    id:"LH-"+(patientCounter++), name, age, dept, doc, bed,
+    date:new Date().toISOString().slice(0,10), status
+  });
+  document.getElementById("np-name").value="";
+  document.getElementById("np-age").value="";
+  document.getElementById("np-bed").value="";
+  renderPatients();
+});
+
+/* ============ Appointment form ============ */
+document.getElementById("ap-dept").insertAdjacentHTML("beforeend", deptSelectOptions);
+document.getElementById("ap-submit").addEventListener("click", ()=>{
+  const name = document.getElementById("ap-name").value.trim();
+  const phone = document.getElementById("ap-phone").value.trim();
+  if(!name || !phone){ alert("Please enter your name and phone number."); return; }
+  document.getElementById("ap-success").style.display = "block";
+  document.getElementById("ap-name").value="";
+  document.getElementById("ap-phone").value="";
+  document.getElementById("ap-date").value="";
+  document.getElementById("ap-msg").value="";
+});
+
+/* ============ init ============ */
+renderDoctors();
+renderPatients();
+navigateHash();
+</script>
+</body>
+</html>
