@@ -1,0 +1,675 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CrmLeadManagement</name>
+    </assembly>
+    <members>
+        <member name="T:CrmLeadManagement.Controllers.Api.ClientsApiController">
+            <summary>
+            JSON REST API for Clients / Customers lookup.
+            Base route: /api/clients
+            </summary>
+        </member>
+        <member name="T:CrmLeadManagement.Controllers.Api.InvoicesApiController">
+            <summary>
+            JSON REST API for Invoices module.
+            Base route: /api/invoices
+            Supports milestone-based invoicing (1 milestone = 1 invoice), export, PDF generation, recurring invoices, and payment integration.
+            </summary>
+        </member>
+        <member name="T:CrmLeadManagement.Controllers.Api.LeadsApiController">
+            <summary>
+            JSON REST API for leads, backed by the same in-memory LeadStore used by the MVC views.
+            Base route: /api/leads
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Controllers.Api.LeadsApiController.TrySaveAsync(System.String)">
+            <summary>
+            Saves pending changes right here, inside the action, before we return any result.
+            This is what actually fixes the "200 OK then ERR_INCOMPLETE_CHUNKED_ENCODING" symptom:
+            previously SaveChangesAsync() only ran in a trailing middleware in Program.cs, i.e.
+            *after* this action had already returned Ok(...) and MVC had started writing the 200
+            response to the client. If the save failed at that point it was too late to send a
+            proper error — the connection was simply aborted mid-stream. Saving here means a DB
+            failure is caught before any response is written, so the caller gets a clean 500 with
+            a complete JSON body instead of a truncated chunked response.
+            </summary>
+        </member>
+        <member name="T:CrmLeadManagement.Controllers.Api.MilestonesApiController">
+            <summary>
+            JSON REST API for Milestones module.
+            Base route: /api/milestones
+            </summary>
+        </member>
+        <member name="T:CrmLeadManagement.Controllers.Api.PaymentsApiController">
+            <summary>
+            JSON REST API for Payments module.
+            Base route: /api/payments
+            Supports payment creation, listing, invoice linking, validation against remaining balance, and status synchronization.
+            </summary>
+        </member>
+        <member name="T:CrmLeadManagement.Controllers.Api.ProjectsApiController">
+            <summary>
+            JSON REST API for Projects module.
+            Base route: /api/projects
+            </summary>
+        </member>
+        <member name="T:CrmLeadManagement.Controllers.Api.RecurringInvoicesApiController">
+            <summary>
+            JSON REST API for Recurring Invoices module.
+            Base route: /api/recurring-invoices
+            </summary>
+        </member>
+        <member name="T:CrmLeadManagement.Controllers.Api.SettingsApiController">
+            <summary>
+            JSON REST API for app settings (lead statuses, lead sources, users/roles, follow-up defaults).
+            Base route: /api/settings
+            </summary>
+        </member>
+        <member name="T:CrmLeadManagement.Controllers.Api.TasksApiController">
+            <summary>
+            JSON REST API for Tasks module.
+            Base route: /api/tasks
+            </summary>
+        </member>
+        <member name="T:CrmLeadManagement.Controllers.Api.TeamApiController">
+            <summary>
+            REST API endpoints for Team and Role &amp; Permission management.
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Controllers.Api.TeamApiController.GetRoles">
+            <summary>
+            Gets all roles with their assigned users count.
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Controllers.Api.TeamApiController.GetRoleDetails(System.String)">
+            <summary>
+            Gets permissions and configuration for a specific role by name.
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Controllers.Api.TeamApiController.SavePermissions(CrmLeadManagement.Models.SaveRolePermissionsDto)">
+            <summary>
+            Saves permissions and data access configuration for a role.
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "T:CrmLeadManagement.Controllers.Api.WorkApiController" -->
+        <member name="T:CrmLeadManagement.Controllers.AppApi.AppAuthController">
+            <summary>
+            Mobile app authentication endpoints.
+            Route prefix: /api/v1/app/auth (and /api/auth)
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Controllers.AppApi.AppAuthController.Login(CrmLeadManagement.Models.Dtos.App.AppLoginRequest)">
+            <summary>
+            Authenticates a user with email and password, returning an opaque Bearer token.
+            Rate-limited to 10 requests per minute per IP.
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Controllers.AppApi.AppAuthController.Logout">
+            <summary>
+            Revokes the current token.
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Controllers.AppApi.AppAuthController.LogoutAll">
+            <summary>
+            Revokes all active tokens for the current user across all devices.
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Controllers.AppApi.AppAuthController.GetMe">
+            <summary>
+            Returns the currently authenticated user's profile.
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Controllers.AppApi.AppAuthController.ChangePassword(CrmLeadManagement.Models.Dtos.App.AppChangePasswordRequest)">
+            <summary>
+            Changes the current user's password and revokes all other active tokens.
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Controllers.AppApi.AppAuthController.Register(CrmLeadManagement.Models.Dtos.App.AppRegisterRequest)">
+            <summary>
+            Optional self-registration endpoint (enabled if Auth:RegistrationMode is Open or ApprovalRequired).
+            </summary>
+        </member>
+        <member name="T:CrmLeadManagement.Controllers.AppApi.AppLeadsController">
+            <summary>
+            Mobile/App-specific JSON REST API for leads.
+            Base route: /api/v1/app/leads
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Controllers.AppApi.AppLeadsController.GetLeads">
+            <summary>
+            Gets all leads formatted for app consumption.
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Controllers.AppApi.AppLeadsController.GetLead(System.String)">
+            <summary>
+            Gets a single lead by LeadId code or numeric ID.
+            </summary>
+        </member>
+        <member name="T:CrmLeadManagement.Controllers.AuthController">
+            <summary>
+            Web authentication controller providing Login, Logout, and session management.
+            Serves the browser login page at /login, /auth/login, and /account/login.
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Controllers.AuthController.Login(System.String)">
+            <summary>
+            Displays the login page.
+            Routes supported: /login, /auth/login, /account/login
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Controllers.AuthController.Login(CrmLeadManagement.Models.LoginViewModel)">
+            <summary>
+            Handles user login submission (supports both standard HTML form post and AJAX/JSON).
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Controllers.AuthController.Logout">
+            <summary>
+            Signs out the user, clears authentication cookie, and redirects to login page.
+            Routes supported: /logout, /auth/logout, /account/logout
+            </summary>
+        </member>
+        <member name="T:CrmLeadManagement.Controllers.FinanceController">
+            <summary>
+            Sidebar-level Finance module: Invoices, Payments, Recurring Invoices,
+            Estimation List / Quotation List / Proposal List, and dedicated Details pages.
+            </summary>
+        </member>
+        <member name="T:CrmLeadManagement.Controllers.FinanceListRow">
+            <summary>Flat row used by the three sidebar Finance list pages (one lead + one finance record per row).</summary>
+        </member>
+        <member name="M:CrmLeadManagement.Controllers.LeadController.Save(CrmLeadManagement.Models.LeadInputModel,System.String)">
+            <summary>
+            Handles both Add (empty LeadId) and Edit/Reassign (existing LeadId) from the
+            shared lead modal. Shared by both the Lead List and Assigned List pages, which
+            each pass their own URL back in returnUrl so the user lands back where they were.
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Controllers.LeadController.AddCall(System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>Logs a new call against the lead and returns to the Call tab.</summary>
+        </member>
+        <member name="M:CrmLeadManagement.Controllers.LeadController.AddFollowUp(System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>Logs a new follow-up against the lead and returns to the Follow-up tab.</summary>
+        </member>
+        <member name="M:CrmLeadManagement.Controllers.LeadController.AddVisit(System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>Logs a new visit against the lead and returns to the Visit tab.</summary>
+        </member>
+        <member name="M:CrmLeadManagement.Controllers.LeadController.AddRequirement(System.String,System.String,System.String,System.String,System.String,System.String,System.String,Microsoft.AspNetCore.Http.IFormFile,System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String})">
+            <summary>Adds a new requirement (with optional image) against the lead and returns to the Requirement tab.</summary>
+        </member>
+        <member name="M:CrmLeadManagement.Controllers.LeadController.AssignLead(System.String,System.String,System.String,System.String)">
+            <summary>Assigns or re-assigns the lead to an employee and logs the change.</summary>
+        </member>
+        <member name="M:CrmLeadManagement.Controllers.LeadController.SaveEstimation(System.String,System.String,System.String,System.String,System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.String,System.String,System.String,System.String,System.String,System.String,Microsoft.AspNetCore.Http.IFormFile,System.String,System.String,System.String)">
+            <summary>Creates a new Estimation, or updates an existing one when 'number' is supplied. Always linked to leadId.</summary>
+        </member>
+        <member name="M:CrmLeadManagement.Controllers.LeadController.SaveQuotation(System.String,System.String,System.String,System.String,System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.String,System.String,System.String,System.String,System.String,System.String,Microsoft.AspNetCore.Http.IFormFile,System.String,System.String,System.String)">
+            <summary>Creates a new Quotation, or updates an existing one when 'number' is supplied. Always linked to leadId.</summary>
+        </member>
+        <member name="M:CrmLeadManagement.Controllers.LeadController.SaveProposal(System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,System.String,Microsoft.AspNetCore.Http.IFormFile,System.String,System.String,System.String)">
+            <summary>Creates a new Proposal, or updates an existing one when 'number' is supplied. Always linked to leadId.</summary>
+        </member>
+        <member name="M:CrmLeadManagement.Controllers.LeadController.BuildLineItems(System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String})">
+            <summary>Builds the Items/Services line-item list from the parallel form arrays posted by the Finance forms.</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Filters.SaveChangesFilter">
+            <summary>
+            Commits tracked EF Core changes right after an action finishes but BEFORE its result
+            (view / JSON) is written to the client.
+            Automatically handles DB update exceptions, rolls back corrupted tracker state,
+            and returns clean API error responses or logs MVC errors.
+            </summary>
+        </member>
+        <member name="T:CrmLeadManagement.Migrations.InitialCreate">
+            <inheritdoc />
+        </member>
+        <member name="M:CrmLeadManagement.Migrations.InitialCreate.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:CrmLeadManagement.Migrations.InitialCreate.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:CrmLeadManagement.Migrations.InitialCreate.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:CrmLeadManagement.Migrations.MakeLeadRemarksNullable">
+            <inheritdoc />
+        </member>
+        <member name="M:CrmLeadManagement.Migrations.MakeLeadRemarksNullable.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:CrmLeadManagement.Migrations.MakeLeadRemarksNullable.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:CrmLeadManagement.Migrations.MakeLeadRemarksNullable.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:CrmLeadManagement.Migrations.AddWorkManagementModule">
+            <inheritdoc />
+        </member>
+        <member name="M:CrmLeadManagement.Migrations.AddWorkManagementModule.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:CrmLeadManagement.Migrations.AddWorkManagementModule.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:CrmLeadManagement.Migrations.AddWorkManagementModule.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:CrmLeadManagement.Migrations.UpdateSchema">
+            <inheritdoc />
+        </member>
+        <member name="M:CrmLeadManagement.Migrations.UpdateSchema.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:CrmLeadManagement.Migrations.UpdateSchema.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:CrmLeadManagement.Migrations.UpdateSchema.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:CrmLeadManagement.Migrations.AddWorkFileTimesheetExpenseNote">
+            <inheritdoc />
+        </member>
+        <member name="M:CrmLeadManagement.Migrations.AddWorkFileTimesheetExpenseNote.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:CrmLeadManagement.Migrations.AddWorkFileTimesheetExpenseNote.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:CrmLeadManagement.Migrations.AddWorkFileTimesheetExpenseNote.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:CrmLeadManagement.Migrations.SyncModel">
+            <inheritdoc />
+        </member>
+        <member name="M:CrmLeadManagement.Migrations.SyncModel.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:CrmLeadManagement.Migrations.SyncModel.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:CrmLeadManagement.Migrations.SyncModel.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:CrmLeadManagement.Migrations.AddCallHistoryRemark">
+            <inheritdoc />
+        </member>
+        <member name="M:CrmLeadManagement.Migrations.AddCallHistoryRemark.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:CrmLeadManagement.Migrations.AddCallHistoryRemark.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:CrmLeadManagement.Migrations.AddCallHistoryRemark.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:CrmLeadManagement.Migrations.AddBearerTokenAuth">
+            <inheritdoc />
+        </member>
+        <member name="M:CrmLeadManagement.Migrations.AddBearerTokenAuth.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:CrmLeadManagement.Migrations.AddBearerTokenAuth.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:CrmLeadManagement.Migrations.AddBearerTokenAuth.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:CrmLeadManagement.Models.AccessToken">
+            <summary>
+            Opaque bearer access token entity storing SHA-256 hash.
+            Plain tokens are 32 random bytes (Base64Url encoded) returned only once at login.
+            </summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.AppDbContext">
+            <summary>
+            EF Core database context for SQL Server.
+            </summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.LeadStatusOption">
+            <summary>One selectable Lead Status value (Settings > Lead Status).</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.LeadSourceOption">
+            <summary>One selectable Lead Source value (Settings > Lead Sources).</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.DbAccessor">
+             <summary>
+             LeadStore and SettingsStore are static classes (used all over the existing
+             controllers/views without a constructor), so they can't take AppDbContext via
+             normal constructor injection. This gives them a way to reach the current HTTP
+             request's DbContext instead — ASP.NET Core already creates one AppDbContext
+             per request (see AddDbContext in Program.cs); this just hands it to code that
+             isn't itself a controller.
+            
+             HttpContextAccessor is assigned once, at startup, in Program.cs.
+             </summary>
+        </member>
+        <member name="P:CrmLeadManagement.Models.DbAccessor.Db">
+            <summary>The AppDbContext for the current HTTP request.</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.Dtos.ApiError">
+            <summary>Generic error payload returned by the API on failure (400/404/500).</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.Dtos.AddCallRequest">
+            <summary>Body for POST /api/leads/{id}/calls and POST /api/leads/{id}/call-details</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.Dtos.AddFollowUpRequest">
+            <summary>Body for POST /api/leads/{id}/followups</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.Dtos.AddVisitRequest">
+            <summary>Body for POST /api/leads/{id}/visits</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.Dtos.AddRequirementRequest">
+            <summary>Body for POST /api/leads/{id}/requirements (JSON, no image). Use the multipart
+            endpoint (same route, multipart/form-data) if an image needs to be uploaded.</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.Dtos.AssignLeadRequest">
+            <summary>Body for POST /api/leads/{id}/assign</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.Dtos.LookupValueRequest">
+            <summary>Body for POST/DELETE on Settings lookup lists (status / source values).</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.Dtos.FinanceLineItemRequest">
+            <summary>A single Item/Service row used in Estimation and Quotation API requests.</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.Dtos.EstimationRequest">
+            <summary>Body for POST/PUT /api/leads/{id}/estimations</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.Dtos.QuotationRequest">
+            <summary>Body for POST/PUT /api/leads/{id}/quotations</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.Dtos.ProposalRequest">
+            <summary>Body for POST/PUT /api/leads/{id}/proposals</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.Dtos.App.AppLoginRequest">
+            <summary>Request payload for mobile app login</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.Dtos.App.AppLoginResponse">
+            <summary>Response payload for mobile app login</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.Dtos.App.AppUserProfileDto">
+            <summary>Mobile app user profile DTO</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.Dtos.App.AppChangePasswordRequest">
+            <summary>Request payload for mobile app password change</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.Dtos.App.AppRegisterRequest">
+            <summary>Request payload for mobile app registration</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.Dtos.App.AppApiError">
+            <summary>Error payload for mobile app API failures</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.Dtos.LoginRequest">
+            <summary>Request payload for POST /api/auth/login</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.Dtos.LoginResponse">
+            <summary>Success payload for POST /api/auth/login</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.Dtos.UserProfileDto">
+            <summary>User profile information returned in auth responses and GET /api/auth/me</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.Dtos.ChangePasswordRequest">
+            <summary>Request payload for POST /api/auth/change-password</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.Dtos.RegisterRequest">
+            <summary>Request payload for POST /api/auth/register</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.FinanceAttachmentService">
+            <summary>
+            Handles saving/replacing/deleting the single optional attachment on an Estimation,
+            Quotation or Proposal record. Files are stored under wwwroot/uploads/finance/{kind}/
+            with a GUID file name (so uploads never overwrite each other), while the record keeps
+            the public relative path plus the original file name for display/download.
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Models.FinanceAttachmentService.SaveAsync(Microsoft.AspNetCore.Http.IFormFile,System.String)">
+            <summary>
+            Saves the uploaded file (if any) under wwwroot/uploads/finance/{kind}/ and returns
+            (relativePath, originalFileName, error). If <paramref name="file"/> is null/empty,
+            returns empty values with no error (caller keeps whatever attachment already existed).
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Models.FinanceAttachmentService.Delete(System.String)">
+            <summary>Deletes the physical file for a relative attachment path, if it exists. Safe to call with an empty path.</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.FinanceHelpers">
+            <summary>Small formatting helpers shared by the sidebar Finance views (Estimation/Quotation/Proposal).</summary>
+        </member>
+        <member name="P:CrmLeadManagement.Models.Lead.Id">
+            <summary>Database primary key (identity column). Not shown in the UI — the UI uses LeadId.</summary>
+        </member>
+        <member name="P:CrmLeadManagement.Models.Lead.LatestVisitLocation">
+            <summary>Latest visit location shown as a quick-glance column in the Lead List.</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.CallDetail">
+            <summary>CallDetail entity representing a single call log entry associated with a Lead.</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.AssignmentEntry">
+            <summary>A single assign/re-assign action logged against a lead.</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.FinanceLineItem">
+            <summary>A single item/service row used inside an Estimation or Quotation.</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.EstimationEntry">
+            <summary>An Estimation raised against a lead (Finance &gt; Estimation tab).</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.QuotationEntry">
+            <summary>A Quotation raised against a lead (Finance &gt; Quotation tab).</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.ProposalEntry">
+            <summary>A Proposal raised against a lead (Finance &gt; Proposal tab). No line items.</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.LookupData">
+            <summary>
+            Fixed lookup lists that are not editable via Settings (kept static/simple by design).
+            Lead Status, Lead Sources and Users/Roles are editable — see <see cref="T:CrmLeadManagement.Models.SettingsStore"/>.
+            </summary>
+        </member>
+        <member name="P:CrmLeadManagement.Models.LookupData.Employees">
+            <summary>Convenience accessor so existing pages can keep using LookupData.Employees etc.</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.LeadInputModel">
+            <summary>
+            Binds the Add/Edit Lead modal form. When LeadId is empty, SaveLead creates a new
+            lead; when it matches an existing lead, SaveLead updates that lead in place.
+            </summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.LeadStore">
+            <summary>
+            Same public API as before (Leads, GetById, AddLead, UpdateLead, DeleteLead, Next*Number),
+            so LeadController / LeadsApiController / FinanceController don't need any changes.
+            Internally this now reads/writes SQL Server through AppDbContext instead of an
+            in-memory list. See DbAccessor for how the DbContext is reached from here.
+            </summary>
+        </member>
+        <member name="P:CrmLeadManagement.Models.LeadStore.Leads">
+            <summary>All leads, with their call/follow-up/requirement/visit/finance history loaded.</summary>
+        </member>
+        <member name="M:CrmLeadManagement.Models.LeadStore.GetById(System.String)">
+            <summary>Returns a tracked entity — callers can mutate it (e.g. lead.CallHistory.Add(...))
+            and the change is saved automatically at the end of the request.</summary>
+        </member>
+        <member name="M:CrmLeadManagement.Models.LeadStore.NextId">
+            <summary>Generates the next sequential Lead ID, e.g. LD-1009, guaranteed unique.</summary>
+        </member>
+        <member name="M:CrmLeadManagement.Models.LeadStore.NextEstimationNumber">
+            <summary>Generates the next sequential Estimation number, e.g. EST-2005.</summary>
+        </member>
+        <member name="M:CrmLeadManagement.Models.LeadStore.NextQuotationNumber">
+            <summary>Generates the next sequential Quotation number, e.g. QUO-2005.</summary>
+        </member>
+        <member name="M:CrmLeadManagement.Models.LeadStore.NextProposalNumber">
+            <summary>Generates the next sequential Proposal number, e.g. PRO-2005.</summary>
+        </member>
+        <member name="M:CrmLeadManagement.Models.LeadStore.AddLead(CrmLeadManagement.Models.Lead)">
+            <summary>Inserts a brand-new lead into the database. Shows up immediately in Lead List / Assigned List.</summary>
+        </member>
+        <member name="M:CrmLeadManagement.Models.LeadStore.UpdateLead(CrmLeadManagement.Models.Lead)">
+            <summary>
+            Updates the core fields of an existing lead in place, preserving its call/follow-up/
+            requirement/visit history so nothing already logged against the lead is lost.
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Models.LeadStore.DeleteLead(System.String)">
+            <summary>Removes a lead permanently from the database.</summary>
+        </member>
+        <member name="M:CrmLeadManagement.Models.LeadStore.SeedIfEmpty(CrmLeadManagement.Models.AppDbContext)">
+            <summary>Called once at startup (see Program.cs) to seed sample leads and finance records,
+            but only if the tables are empty — so it never overwrites real data on subsequent runs.</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.LoginViewModel">
+            <summary>
+            View model for the web login page.
+            Supports login via User ID or Email address.
+            </summary>
+        </member>
+        <member name="P:CrmLeadManagement.Models.LoginViewModel.Email">
+            <summary>Alias for UserId to accept 'Email' form fields as well.</summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "T:CrmLeadManagement.Models.ModulePermissionItem" -->
+        <member name="T:CrmLeadManagement.Models.RoleMaster">
+            <summary>
+            Database entity storing role master configuration and permissions JSON.
+            </summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.SaveRolePermissionsDto">
+            <summary>
+            DTO for saving permissions for a role.
+            </summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.CreateRoleDto">
+            <summary>
+            DTO for creating a new role.
+            </summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.RenameRoleDto">
+            <summary>
+            DTO for renaming a role.
+            </summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.DeleteRoleDto">
+            <summary>
+            DTO for deleting a role.
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "T:CrmLeadManagement.Models.RolesAndPermissionsViewModel" -->
+        <member name="T:CrmLeadManagement.Models.RoleStore">
+            <summary>
+            Static helper and seeder for Roles and default permission templates.
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:CrmLeadManagement.Models.RoleStore.GetDefaultMatrixTemplate" -->
+        <member name="M:CrmLeadManagement.Models.RoleStore.GetSalesExecutivePermissions">
+            <summary>
+            Creates the predefined permissions specifically configured for "Sales Executive"
+            exactly matching the prompt's ASCII diagram!
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Models.RoleStore.GetSalesManagerPermissions">
+            <summary>
+            Creates the predefined permissions for "Sales Manager".
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Models.RoleStore.GetAdminPermissions">
+            <summary>
+            Creates the predefined permissions for "Admin" (full access to all).
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Models.RoleStore.GetTelecallerPermissions">
+            <summary>
+            Creates the predefined permissions for "Telecaller".
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Models.RoleStore.SeedIfEmpty(CrmLeadManagement.Models.AppDbContext)">
+            <summary>
+            Seed initial roles if RoleMasters is empty.
+            </summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.SettingsStore">
+            <summary>
+            Same public API as before (Statuses, Sources, Users, FollowUp, Add/Remove*), so
+            SettingsController / SettingsApiController / LookupData don't need any changes.
+            Internally this now reads/writes SQL Server through AppDbContext instead of an
+            in-memory list.
+            </summary>
+        </member>
+        <member name="P:CrmLeadManagement.Models.SettingsStore.Employees">
+            <summary>Employee names, sourced from Users/Roles so Assign dropdowns stay in sync with Settings.</summary>
+        </member>
+        <member name="M:CrmLeadManagement.Models.SettingsStore.SeedIfEmpty(CrmLeadManagement.Models.AppDbContext,Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>Called once at startup (see Program.cs) to seed the same sample statuses/
+            sources/users the old in-memory version shipped with, but only if the tables are
+            empty — so it never overwrites real data on subsequent runs.</summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.SettingsViewModel">
+            <summary>
+            View model for the Settings page (MVC view), bundling the lookup lists and
+            follow-up defaults that used to live directly on the Razor Pages PageModel.
+            </summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.TaxMaster">
+            <summary>
+            Centralized Tax Master model configurable under Settings -> Tax Master.
+            Supports GST, CGST, SGST, and IGST tax types.
+            </summary>
+        </member>
+        <member name="T:CrmLeadManagement.Models.WorkAttachmentService">
+            <summary>
+            Handles saving and deleting project files and expense receipts under wwwroot/uploads/work/{folder}/.
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Models.WorkAttachmentService.SaveAsync(Microsoft.AspNetCore.Http.IFormFile,System.String)">
+            <summary>
+            Saves the uploaded file under wwwroot/uploads/work/{folder}/
+            Returns (relativePath, originalFileName, fileSizeBytes, fileType, error).
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Models.WorkAttachmentService.Delete(System.String)">
+            <summary>Deletes the physical file for a relative attachment path, if it exists.</summary>
+        </member>
+        <member name="M:CrmLeadManagement.Models.WorkDependencyHelper.ParseTaskDependencyNotes(System.String)">
+            <summary>
+            Parses stored dependency markers like [DEP:123] or [NO_DEP] from task notes.
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Models.WorkDependencyHelper.FormatTaskNotesWithDependency(System.String,System.Boolean,System.Nullable{System.Int32})">
+            <summary>
+            Appends the clean dependency marker [DEP:123] or [NO_DEP] into notes string for storage.
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Models.WorkDependencyHelper.EvaluateMilestone(CrmLeadManagement.Models.WorkMilestone,System.Collections.Generic.IEnumerable{CrmLeadManagement.Models.WorkMilestone},System.Collections.Generic.IEnumerable{CrmLeadManagement.Models.WorkInvoice})">
+            <summary>
+            Calculates the sequential dependency and lock state for a milestone within a project.
+            Condition: Milestone N cannot move/start until Milestone N-1 is fully completed AND its complete invoice is generated and paid.
+            </summary>
+        </member>
+        <member name="M:CrmLeadManagement.Models.WorkDependencyHelper.EvaluateTask(CrmLeadManagement.Models.WorkTask,System.Collections.Generic.IEnumerable{CrmLeadManagement.Models.WorkTask},CrmLeadManagement.Models.WorkMilestone,System.Collections.Generic.IEnumerable{CrmLeadManagement.Models.WorkMilestone},System.Collections.Generic.IEnumerable{CrmLeadManagement.Models.WorkInvoice},System.Collections.Generic.IEnumerable{CrmLeadManagement.Models.WorkTask},System.Nullable{System.Boolean},System.Nullable{System.Int32})">
+            <summary>
+            Calculates the dependency and lock state for a task.
+            Supports explicit dependency (specific prerequisite task), explicit no dependency, or sequential default.
+            </summary>
+        </member>
+        <member name="P:CrmLeadManagement.Models.WorkProject.ProjectType">
+            Direct Project | Milestone Based Project | Task Based Project
+        </member>
+        <member name="T:CrmLeadManagement.Security.BearerTokenAuthenticationHandler">
+            <summary>
+            Custom authentication handler for opaque Bearer tokens.
+            Validates tokens against the AccessTokens database table via ITokenService.
+            Scheme Name: "Bearer"
+            </summary>
+        </member>
+        <member name="T:CrmLeadManagement.Services.TokenCleanupBackgroundService">
+            <summary>
+            Background service that cleans up expired and revoked access tokens older than 7 days.
+            Runs once daily.
+            </summary>
+        </member>
+        <member name="T:Program">
+            <summary>
+            Auto-generated public partial Program class for top-level statement apps.
+            </summary>
+        </member>
+    </members>
+</doc>
